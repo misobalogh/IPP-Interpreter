@@ -4,6 +4,7 @@ namespace IPP\Student;
 
 use IPP\Core\AbstractInterpreter;
 use IPP\Core\Exception\NotImplementedException;
+use IPP\Student\InstructionFactory;
 
 class Interpreter extends AbstractInterpreter
 {
@@ -25,16 +26,20 @@ class Interpreter extends AbstractInterpreter
             echo "Opcode: $opcode\n";
         }
 
-        $program = $dom->getElementsByTagName('program')->item(0);
+        // $program = $dom->getElementsByTagName('program')->item(0);
 
-        if ($program) {
-            $language = $program->getAttribute('language');
+        // if ($program) {
+        //     $language = $program->getAttribute('language');
 
-            echo "Language: $language\n";
-        } else {
-            echo "Program element not found\n";
-        }
-        $var = "var";
+        //     echo "Language: $language\n";
+        // } else {
+        //     echo "Program element not found\n";
+        // }
+
+        $instructionFactory = new InstructionFactory();
+        $instruction = $instructionFactory->createInstruction('MOVE', ["GF@result", "GF@var1", "GF@var2"]);
+        $instruction->execute();
+
 
         return 0;
 
