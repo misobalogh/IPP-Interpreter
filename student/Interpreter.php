@@ -8,6 +8,8 @@ use IPP\Student\InstructionFactory;
 
 class Interpreter extends AbstractInterpreter
 {
+    private array $instructions;
+
     public function execute(): int
     {
         // TODO: Start your code here
@@ -18,13 +20,22 @@ class Interpreter extends AbstractInterpreter
         // $this->stderr->writeString("stderr");
 
         $dom = $this->source->getDOMDocument();
-        $instructions = $dom->getElementsByTagName('instruction');
 
-        foreach ($instructions as $instruction) {
-            $opcode = $this->getOpcode($instruction);
+        $instructions = $this->getInstructionsData($dom);
+        
+        $PC = new ProgramCounter();
 
-            echo "Opcode: $opcode\n";
+        $instructionFactory = new InstructionFactory($PC);
+
+        foreach ($this->instructions as $instructionData) {
+            $instruction = $instructionFactory->createInstruction($instructionData->opcode, $instructionData->args, $PC);
+            $instruction->execute();
+            
         }
+        echo "PC:" . $PC->getCounter()."\n";
+
+        // $instruction = $instructionFactory->createInstruction('MOVE', ["GF@result", "GF@var1", "GF@var2"]);
+        // $instruction->execute();
 
         // $program = $dom->getElementsByTagName('program')->item(0);
 
@@ -35,22 +46,18 @@ class Interpreter extends AbstractInterpreter
         // } else {
         //     echo "Program element not found\n";
         // }
-
-        $instructionFactory = new InstructionFactory();
-        $instruction = $instructionFactory->createInstruction('MOVE', ["GF@result", "GF@var1", "GF@var2"]);
-        $instruction->execute();
-
-
+     
         return 0;
-
-        // throw new NotImplementedException;
     }
 
-
-    private function getOpcode($instruction)
+    private function getInstructionsData($dom)
     {
-        return $instruction->getAttribute('opcode');
-    }
-
+        $instructionsArray = array();
+        foreach ($dom->getElementsByTagName('instruction') as $instruction) {
+            $instructionData = new InstructionData($instruction);
+            $instructionsArray[] = $instructionData;
+        }
+        $this->instructions = $instructionsArray;
+    } 
     
 }
