@@ -7,12 +7,10 @@ namespace IPP\Student;
 abstract class Instruction
 {
     protected array $args;
-    protected ProgramCounter $PC;
 
-    final public function __construct(array $args, ProgramCounter $PC)
+    final public function __construct(array $args)
     {
         $this->args = $args;
-        $this->PC = $PC;
     }
 
     abstract public function execute(): int;
@@ -25,7 +23,6 @@ class InstructionMove extends Instruction
 {
     public function execute(): int{
         echo "MOVE\n";
-        $this->PC->increment();
         return 0;
     }
 }
@@ -58,7 +55,7 @@ class InstructionDefVar extends Instruction
 {
     public function execute(): int{
         echo "DEFVAR\n";
-        $this->PC->increment();
+        // ProgramFlow::getCurrentFrame()->setData($this->args[0]->value, null);
         return 0;
     }
 }
@@ -284,6 +281,7 @@ class InstructionJump extends Instruction
 {
     public function execute(): int{
         echo "JUMP\n";
+        ProgramFlow::jumpTo($this->args[0]->value);
         return 0;
     }
 }

@@ -12,6 +12,7 @@ class InstructionData
     final public function __construct($instruction)
     {
         $this->instruction = $instruction;
+        print_r($this->instruction);
         $this->order = $this->getOrder();
         $this->opcode = $this->getOpcode();
         $this->args = $this->getArgs(); 
@@ -36,7 +37,14 @@ class InstructionData
             if ($arg->nodeType === XML_ELEMENT_NODE && strpos($arg->nodeName, 'arg') === 0) {
                 $type = $arg->getAttribute('type');
                 $argName = $arg->nodeValue;
-                $args[] = new InstructionArgument($type, $argName);
+                if (strpos($argName, '@') !== false) {
+                    list($frame, $value) = explode('@', $arg->value);
+                }
+                else {
+                    $frame = null;
+                    $value = $arg->value;
+                }
+                $args[] = new InstructionArgument($type, $frame, $value);
             }
         }
 
@@ -52,14 +60,20 @@ class InstructionData
  * Class for storing argument of instruction
  *
  * @property string $type
+ * @property string $frame
  * @property string $value
  */
-class InstructionArgument {
+class InstructionArgument
+{
     public string $type;
+    public ?string $frame;
     public string $value;
 
-    public function __construct($type, $value) {
+    public function __construct(string $type, ?string $frame, string $value)
+    {
         $this->type = $type;
+        $this->frame = $frame;
         $this->value = $value;
     }
 }
+

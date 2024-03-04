@@ -23,17 +23,20 @@ class Interpreter extends AbstractInterpreter
 
         $instructions = $this->getInstructionsData($dom);
         
-        $PC = new ProgramCounter();
+        $instructionFactory = new InstructionFactory();
 
-        $instructionFactory = new InstructionFactory($PC);
+        ProgramFlow::initialize($this->instructions);
 
-        foreach ($this->instructions as $instructionData) {
-            $instruction = $instructionFactory->createInstruction($instructionData->opcode, $instructionData->args, $PC);
+        
+
+        while (ProgramFlow::getPointer() < count($this->instructions)) {
+            $instructionData = $this->instructions[ProgramFlow::getPointer()];
+            $instruction = $instructionFactory->createInstruction($instructionData->opcode, $instructionData->args);
             $instruction->execute();
-            
+            print_r($instructionData);
+            ProgramFlow::increment();
+            // echo "Pointer at: " . ProgramFlow::getPointer() . "\n";
         }
-        echo "PC:" . $PC->getCounter()."\n";
-
         // $instruction = $instructionFactory->createInstruction('MOVE', ["GF@result", "GF@var1", "GF@var2"]);
         // $instruction->execute();
 

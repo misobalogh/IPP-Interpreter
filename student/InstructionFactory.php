@@ -9,82 +9,76 @@ require_once "Instruction.php";
 
 class InstructionFactory
 {
-    private ProgramCounter $PC;
-    public function __construct(ProgramCounter $PC)
-    {
-        $this->PC = $PC;
-    }
-
     public function createInstruction(string $opcode, array $args): Instruction{
         switch ($opcode) {
             case OP_codes::MOVE:
-                return new InstructionMove($args, $this->PC);
+                return new InstructionMove($args);
             case OP_codes::CREATEFRAME:
-                return new InstructionCreateFrame($args, $this->PC);
+                return new InstructionCreateFrame($args);
             case OP_codes::PUSHFRAME:
-                return new InstructionPushFrame($args, $this->PC);
+                return new InstructionPushFrame($args);
             case OP_codes::POPFRAME:
-                return new InstructionPopFrame($args, $this->PC);
+                return new InstructionPopFrame($args);
             case OP_codes::DEFVAR:
-                return new InstructionDefVar($args, $this->PC);
+                return new InstructionDefVar($args);
             case OP_codes::CALL:
-                return new InstructionCall($args, $this->PC);
+                return new InstructionCall($args);
             case OP_codes::RETURN:
-                return new InstructionReturn($args, $this->PC);
+                return new InstructionReturn($args);
             case OP_codes::PUSHS:
-                return new InstructionPushs($args, $this->PC);
+                return new InstructionPushs($args);
             case OP_codes::POPS:
-                return new InstructionPops($args, $this->PC);
+                return new InstructionPops($args);
             case OP_codes::ADD:
-                return new InstructionAdd($args, $this->PC);
+                return new InstructionAdd($args);
             case OP_codes::SUB:
-                return new InstructionSub($args, $this->PC);
+                return new InstructionSub($args);
             case OP_codes::MUL:
-                return new InstructionMul($args, $this->PC);
+                return new InstructionMul($args);
             case OP_codes::IDIV:
-                return new InstructionIDiv($args, $this->PC);
+                return new InstructionIDiv($args);
             case OP_codes::LT:
-                return new InstructionLt($args, $this->PC);
+                return new InstructionLt($args);
             case OP_codes::GT:
-                return new InstructionGt($args, $this->PC);
+                return new InstructionGt($args);
             case OP_codes::EQ:
-                return new InstructionEq($args, $this->PC);
+                return new InstructionEq($args);
             case OP_codes::AND:
-                return new InstructionAnd($args, $this->PC);
+                return new InstructionAnd($args);
             case OP_codes::OR:
-                return new InstructionOr($args, $this->PC);
+                return new InstructionOr($args);
             case OP_codes::NOT:
-                return new InstructionNot($args, $this->PC);
+                return new InstructionNot($args);
             case OP_codes::INT2CHAR:
-                return new InstructionInt2Char($args, $this->PC);
+                return new InstructionInt2Char($args);
             case OP_codes::STRI2INT:
-                return new InstructionStri2Int($args, $this->PC);
+                return new InstructionStri2Int($args);
             case OP_codes::READ:
-                return new InstructionRead($args, $this->PC);
+                return new InstructionRead($args);
             case OP_codes::WRITE:
-                return new InstructionWrite($args, $this->PC);
+                return new InstructionWrite($args);
             case OP_codes::CONCAT:
-                return new InstructionConcat($args, $this->PC);
+                return new InstructionConcat($args);
             case OP_codes::STRLEN:
-                return new InstructionStrlen($args, $this->PC);
+                return new InstructionStrlen($args);
             case OP_codes::GETCHAR:
-                return new InstructionGetChar($args, $this->PC);
+                return new InstructionGetChar($args);
             case OP_codes::SETCHAR:
-                return new InstructionSetChar($args, $this->PC);
+                return new InstructionSetChar($args);
             case OP_codes::TYPE:
-                return new InstructionType($args, $this->PC);
+                return new InstructionType($args);
             case OP_codes::LABEL:
-                return new InstructionLabel($args, $this->PC);
+                return new InstructionLabel($args);
             case OP_codes::JUMP:
-                return new InstructionJump($args, $this->PC);
+                return new InstructionJump($args);
             case OP_codes::JUMPIFEQ:
-                return new InstructionJumpIfEq($args, $this->PC);
+                return new InstructionJumpIfEq($args);
             case OP_codes::EXIT:
-                return new InstructionExit($args, $this->PC);
+                return new InstructionExit($args);
             case OP_codes::DPRINT:
-                return new InstructionDprint($args, $this->PC);
+                return new InstructionDprint($args);
             case OP_codes::BREAK:
-                return new InstructionBreak($args, $this->PC);
+                return new InstructionBreak($args);
             default:
                 throw new InternalErrorException("Unknown opcode: $opcode");
         }
