@@ -69,13 +69,21 @@ class InstructionArgument
 {
     public string $type;
     public ?string $frame;
-    public string $value;
+    public $value;
 
     public function __construct(string $type, ?string $frame, string $value)
     {
         $this->type = $type;
         $this->frame = $frame;
-        $this->value = $value;
+        if ($type === DataType::INT) {
+            $this->value = (int)$value;
+        }
+        else if ($type === DataType::BOOL) {
+            $this->value = $value === "true";
+        }
+        else {
+            $this->value = $value;
+        }
     }
 
     public function isDefined(): bool

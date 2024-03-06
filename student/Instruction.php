@@ -5,6 +5,7 @@ namespace IPP\Student;
 use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\WrongOperandTypeException;
 use IPP\Student\Exception\UndefinedVariableException;
+use IPP\Student\Exception\OperandValueException;
 use IPP\Core\StreamWriter;
 
 #=========== Abstract class for instructions ===========
@@ -52,7 +53,6 @@ class InstructionMove extends Instruction
 class InstructionCreateFrame extends Instruction
 {
     public function execute(): int{
-        echo "CREATEFRAME\n";
         return 0;
     }
 }
@@ -60,7 +60,6 @@ class InstructionCreateFrame extends Instruction
 class InstructionPushFrame extends Instruction
 {
     public function execute(): int{
-        echo "PUSHFRAME\n";
         return 0;
     }
 }
@@ -68,7 +67,6 @@ class InstructionPushFrame extends Instruction
 class InstructionPopFrame extends Instruction
 {
     public function execute(): int{
-        echo "POPFRAME\n";
         return 0;
     }
 }
@@ -76,7 +74,6 @@ class InstructionPopFrame extends Instruction
 class InstructionDefVar extends Instruction
 {
     public function execute(): int{
-        echo "DEFVAR\n";
         ProgramFlow::addToFrame($this->args[0]->frame, $this->args[0]->value, null, null);     
         return 0;
     }
@@ -85,7 +82,6 @@ class InstructionDefVar extends Instruction
 class InstructionCall extends Instruction
 {
     public function execute(): int{
-        echo "CALL\n";
         return 0;
     }
 }
@@ -93,7 +89,6 @@ class InstructionCall extends Instruction
 class InstructionReturn extends Instruction
 {
     public function execute(): int{
-        echo "RETURN\n";
         return 0;
     }
 }
@@ -105,7 +100,6 @@ class InstructionReturn extends Instruction
 class InstructionPushs extends Instruction
 {
     public function execute(): int{
-        echo "PUSHS\n";
         return 0;
     }
 }
@@ -113,7 +107,6 @@ class InstructionPushs extends Instruction
 class InstructionPops extends Instruction
 {
     public function execute(): int{
-        echo "POPS\n";
         return 0;
     }
 }
@@ -125,7 +118,22 @@ class InstructionPops extends Instruction
 class InstructionAdd extends Instruction
 {
     public function execute(): int{
-        echo "ADD\n";
+        $this->checkArgs();
+
+        $symbol1_value = $this->args[1]->getValue();
+        $symbol1_type = $this->args[1]->getType();
+
+        $symbol2_value = $this->args[2]->getValue();
+        $symbol2_type = $this->args[2]->getType();
+
+        if ($symbol1_type !== DataType::INT || $symbol2_type !== DataType::INT) {
+            throw new WrongOperandTypeException("ADD accepts only integers");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $symbol1_value + $symbol2_value);
         return 0;
     }
 }
@@ -133,7 +141,23 @@ class InstructionAdd extends Instruction
 class InstructionSub extends Instruction
 {
     public function execute(): int{
-        echo "SUB\n";
+        $this->checkArgs();
+
+        $symbol1_value = $this->args[1]->getValue();
+        $symbol1_type = $this->args[1]->getType();
+
+        $symbol2_value = $this->args[2]->getValue();
+        $symbol2_type = $this->args[2]->getType();
+
+        if ($symbol1_type !== DataType::INT || $symbol2_type !== DataType::INT) {
+            throw new WrongOperandTypeException("SUB accepts only integers");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $symbol1_value - $symbol2_value);
+
         return 0;
     }
 }
@@ -141,7 +165,23 @@ class InstructionSub extends Instruction
 class InstructionMul extends Instruction
 {
     public function execute(): int{
-        echo "MUL\n";
+        $this->checkArgs();
+
+        $symbol1_value = $this->args[1]->getValue();
+        $symbol1_type = $this->args[1]->getType();
+
+        $symbol2_value = $this->args[2]->getValue();
+        $symbol2_type = $this->args[2]->getType();
+
+        if ($symbol1_type !== DataType::INT || $symbol2_type !== DataType::INT) {
+            throw new WrongOperandTypeException("MUL accepts only integers");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $symbol1_value * $symbol2_value);
+
         return 0;
     }
 }
@@ -149,7 +189,27 @@ class InstructionMul extends Instruction
 class InstructionIDiv extends Instruction
 {
     public function execute(): int{
-        echo "IDIV\n";
+        $this->checkArgs();
+
+        $symbol1_value = $this->args[1]->getValue();
+        $symbol1_type = $this->args[1]->getType();
+
+        $symbol2_value = $this->args[2]->getValue();
+        $symbol2_type = $this->args[2]->getType();
+
+        if ($symbol1_type !== DataType::INT || $symbol2_type !== DataType::INT) {
+            throw new WrongOperandTypeException("IDIV accepts only integers");
+        }
+
+        if ($symbol2_value === 0) {
+            throw new OperandValueException("Division by zero");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, intdiv($symbol1_value, $symbol2_value));
+        
         return 0;
     }
 }
@@ -157,7 +217,22 @@ class InstructionIDiv extends Instruction
 class InstructionLt extends Instruction
 {
     public function execute(): int{
-        echo "LT\n";
+        $symbol1_type = $this->args[1]->getType();
+        $symbol2_type = $this->args[2]->getType();
+        
+        if ($symbol1_type === DataType::NIL || $symbol2_type === DataType::NIL) {
+            throw new WrongOperandTypeException("Cannot compare with nil");
+        }
+
+        if ($symbol1_type !== $symbol2_type) {
+            throw new WrongOperandTypeException("Cannot compare different types");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() < $this->args[2]->getValue());
+
         return 0;
     }
 }
@@ -165,7 +240,22 @@ class InstructionLt extends Instruction
 class InstructionGt extends Instruction
 {
     public function execute(): int{
-        echo "GT\n";
+        $symbol1_type = $this->args[1]->getType();
+        $symbol2_type = $this->args[2]->getType();
+        
+        if ($symbol1_type === DataType::NIL || $symbol2_type === DataType::NIL) {
+            throw new WrongOperandTypeException("Cannot compare with nil");
+        }
+
+        if ($symbol1_type !== $symbol2_type) {
+            throw new WrongOperandTypeException("Cannot compare different types");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() > $this->args[2]->getValue());
+
         return 0;
     }
 }
@@ -173,7 +263,18 @@ class InstructionGt extends Instruction
 class InstructionEq extends Instruction
 {
     public function execute(): int{
-        echo "EQ\n";
+        $symbol1_type = $this->args[1]->getType();
+        $symbol2_type = $this->args[2]->getType();
+        
+        if ($symbol1_type !== $symbol2_type) {
+            throw new WrongOperandTypeException("Cannot compare different types");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() === $this->args[2]->getValue());
+
         return 0;
     }
 }
@@ -181,7 +282,6 @@ class InstructionEq extends Instruction
 class InstructionAnd extends Instruction
 {
     public function execute(): int{
-        echo "AND\n";
         return 0;
     }
 }
@@ -189,7 +289,6 @@ class InstructionAnd extends Instruction
 class InstructionOr extends Instruction
 {
     public function execute(): int{
-        echo "OR\n";
         return 0;
     }
 }   
@@ -197,7 +296,6 @@ class InstructionOr extends Instruction
 class InstructionNot extends Instruction
 {
     public function execute(): int{
-        echo "NOT\n";
         return 0;
     }
 }
@@ -205,7 +303,6 @@ class InstructionNot extends Instruction
 class InstructionInt2Char extends Instruction
 {
     public function execute(): int{
-        echo "INT2CHAR\n";
         return 0;
     }
 }
@@ -213,7 +310,6 @@ class InstructionInt2Char extends Instruction
 class InstructionStri2Int extends Instruction
 {
     public function execute(): int{
-        echo "STRI2INT\n";
         return 0;
     }
 }
@@ -225,7 +321,6 @@ class InstructionStri2Int extends Instruction
 class InstructionRead extends Instruction
 {
     public function execute(): int{
-        echo "READ\n";
         return 0;
     }
 }
@@ -288,14 +383,14 @@ class InstructionConcat extends Instruction
         $symbol2_type = $this->args[2]->getType();
 
         if ($symbol1_type !== DataType::STRING || $symbol2_type !== DataType::STRING) {
-            throw new WrongOperandTypeException("Cannot concatenate non-strings");
+            throw new WrongOperandTypeException("Cannot concatenate other types than strings");
         }
 
         $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
 
-        ProgramFlow::getGlobalFrame()->setData($valueSet, DataType::STRING, $symbol1_value . $symbol2_value);
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::STRING, $symbol1_value . $symbol2_value);
         
-        // echo "CONCAT\n";
         return 0;
     }
 }
@@ -303,15 +398,23 @@ class InstructionConcat extends Instruction
 class InstructionStrlen extends Instruction
 {
     public function execute(): int{
-        echo "STRLEN\n";
-        return 0;
+        $symbol1_type = $this->args[1]->getType();
+        if ($symbol1_type !== DataType::STRING) {
+            throw new WrongOperandTypeException("STRLEN accepts only strings");
+        }
+
+        $symbol1_vlaue = $this->args[1]->getValue();
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, strlen($symbol1_vlaue));
     }
 }
 
 class InstructionGetChar extends Instruction
 {
     public function execute(): int{
-        echo "GETCHAR\n";
         return 0;
     }
 }
@@ -319,7 +422,6 @@ class InstructionGetChar extends Instruction
 class InstructionSetChar extends Instruction
 {
     public function execute(): int{
-        echo "SETCHAR\n";
         return 0;
     }
 }
@@ -332,7 +434,6 @@ class InstructionSetChar extends Instruction
 class InstructionType extends Instruction
 {
     public function execute(): int{
-        echo "TYPE\n";
         return 0;
     }
 }
@@ -344,7 +445,6 @@ class InstructionType extends Instruction
 class InstructionLabel extends Instruction
 {
     public function execute(): int{
-        echo "LABEL\n";
         return 0;
     }
 }
@@ -352,7 +452,6 @@ class InstructionLabel extends Instruction
 class InstructionJump extends Instruction
 {
     public function execute(): int{
-        // echo "JUMP\n";
         ProgramFlow::jumpTo($this->args[0]->value);
         return 0;
     }
@@ -377,8 +476,6 @@ class InstructionJumpIfEQ extends Instruction
             ProgramFlow::jumpTo($label);
         }
         
-        // echo "JUMPIFEQ\n";
-
         return 0;
     }
 }
@@ -401,7 +498,6 @@ class InstructionJumpIfNEQ extends Instruction
         if ($symbol1_value !== $symbol2_value) {
             ProgramFlow::jumpTo($label);
         }
-        // echo "JUMPIFNEQ\n";
         return 0;
     }
 }
@@ -409,7 +505,6 @@ class InstructionJumpIfNEQ extends Instruction
 class InstructionExit extends Instruction
 {
     public function execute(): int{
-        echo "EXIT\n";
         return 0;
     }
 }
@@ -458,7 +553,6 @@ class InstructionDprint extends Instruction
 class InstructionBreak extends Instruction
 {
     public function execute(): int{
-        echo "BREAK\n";
         return 0;
     }
 }
