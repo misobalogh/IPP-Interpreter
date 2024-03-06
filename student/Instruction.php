@@ -217,6 +217,8 @@ class InstructionIDiv extends Instruction
 class InstructionLt extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+        
         $symbol1_type = $this->args[1]->getType();
         $symbol2_type = $this->args[2]->getType();
         
@@ -240,6 +242,8 @@ class InstructionLt extends Instruction
 class InstructionGt extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+
         $symbol1_type = $this->args[1]->getType();
         $symbol2_type = $this->args[2]->getType();
         
@@ -263,6 +267,7 @@ class InstructionGt extends Instruction
 class InstructionEq extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
         $symbol1_type = $this->args[1]->getType();
         $symbol2_type = $this->args[2]->getType();
         
@@ -282,6 +287,20 @@ class InstructionEq extends Instruction
 class InstructionAnd extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+
+        $symbol1_type = $this->args[1]->getType();
+        $symbol2_type = $this->args[2]->getType();
+        
+        if ($symbol1_type !== DataType::BOOL || $symbol2_type !== DataType::BOOL) {
+            throw new WrongOperandTypeException("AND accepts only booleans");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() && $this->args[2]->getValue());
+
         return 0;
     }
 }
@@ -289,6 +308,20 @@ class InstructionAnd extends Instruction
 class InstructionOr extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+
+        $symbol1_type = $this->args[1]->getType();
+        $symbol2_type = $this->args[2]->getType();
+        
+        if ($symbol1_type !== DataType::BOOL || $symbol2_type !== DataType::BOOL) {
+            throw new WrongOperandTypeException("OR accepts only booleans");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() || $this->args[2]->getValue());
+
         return 0;
     }
 }   
@@ -296,6 +329,19 @@ class InstructionOr extends Instruction
 class InstructionNot extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+
+        $symbol1_type = $this->args[1]->getType();
+        
+        if ($symbol1_type !== DataType::BOOL) {
+            throw new WrongOperandTypeException("NOT accepts only booleans");
+        }
+
+        $valueSet = $this->args[0]->value;
+        $frameSet = $this->args[0]->frame;
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, !$this->args[1]->getValue());
+
         return 0;
     }
 }
@@ -434,6 +480,20 @@ class InstructionSetChar extends Instruction
 class InstructionType extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+        
+        $type = $this->args[1]->getType();
+        
+        $valueSet = $this->args[0]->value;
+        if (!$type) {
+            $valueSet = "";
+        }
+        
+        $frameSet = $this->args[0]->frame; 
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::TYPE, $type);
+
+
         return 0;
     }
 }
@@ -505,7 +565,17 @@ class InstructionJumpIfNEQ extends Instruction
 class InstructionExit extends Instruction
 {
     public function execute(): int{
-        return 0;
+        $this->checkArgs();
+
+        if ($this->args[0]->getType() !== DataType::INT) {
+            throw new WrongOperandTypeException("EXIT accepts only integers");
+        }
+
+        if ($this->args[0]->getValue() < 0 || $this->args[0]->getValue() > 9) {
+            throw new OperandValueException("EXIT accepts only integers in range 0-9");
+        }
+
+        ProgramFlow::exit($this->args[0]->getValue());
     }
 }
 
@@ -552,7 +622,14 @@ class InstructionDprint extends Instruction
 
 class InstructionBreak extends Instruction
 {
+    public function __construct(array $args, private StreamWriter $stderr)
+    {
+        parent::__construct($args);
+    }
+
     public function execute(): int{
+        $this->stderr->writeString("Break");
+        $this->stderr->writeString("Position in program: " . ProgramFlow::getPointer());
         return 0;
     }
 }

@@ -29,7 +29,7 @@ class Interpreter extends AbstractInterpreter
 
         
 
-        while (ProgramFlow::getPointer() < count($this->instructions)) {
+        while (ProgramFlow::continue()) {
             $instructionData = $this->instructions[ProgramFlow::getPointer()];
             $instruction = $instructionFactory->createInstruction($instructionData->opcode, $instructionData->args);
             $instruction->execute();

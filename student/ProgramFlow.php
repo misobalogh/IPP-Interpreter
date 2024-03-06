@@ -156,4 +156,14 @@ class ProgramFlow
     {
         self::$temporaryFrame = null;
     }
+
+    public static function continue(): int
+    {
+        return self::$instructionPointer < count(self::$instructionList);
+    }
+
+    public static function exit(int $value): void
+    {
+        exit($value);
+    }
 }
