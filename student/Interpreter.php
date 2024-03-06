@@ -23,7 +23,7 @@ class Interpreter extends AbstractInterpreter
 
         $instructions = $this->getInstructionsData($dom);
         
-        $instructionFactory = new InstructionFactory();
+        $instructionFactory = new InstructionFactory($this->source, $this->input, $this->stdout, $this->stderr);
 
         ProgramFlow::initialize($this->instructions);
 

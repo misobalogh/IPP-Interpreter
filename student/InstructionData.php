@@ -38,7 +38,7 @@ class InstructionData
             if ($arg->nodeType === XML_ELEMENT_NODE && strpos($arg->nodeName, 'arg') === 0) {
                 $type = $arg->getAttribute('type');
                 $argName = $arg->nodeValue;
-                if (strpos($argName, '@') !== false) {
+                if ($type === DataType::VAR) {
                     list($frame, $value) = explode('@', $argName);
                 }
                 else {
@@ -80,11 +80,11 @@ class InstructionArgument
 
     public function isDefined(): bool
     {
-        if ($this->type === DataType::VAR)
+        if ($this->isVar())
         {
-            return ProgramFlow::getFrame($this->frame)->keyExists($this->value);
+            return ProgramFlow::getFrame($this->frame)->keyExists($this->value) || ProgramFlow::getGlobalFrame()->keyExists($this->value);
         }
-        else if ($this->type === DataType::LABEL)
+        else if ($this->isLabel())
         {
             return ProgramFlow::labelExists($this->value);
         }
@@ -97,7 +97,7 @@ class InstructionArgument
 
     public function getValue()
     {
-        if ($this->type === DataType::VAR)
+        if ($this->isVar())
         {
             return ProgramFlow::getFrame($this->frame)->getData($this->value)["value"];
         }
@@ -109,7 +109,7 @@ class InstructionArgument
 
     public function getType()
     {
-        if ($this->type === DataType::VAR)
+        if ($this->isVar())
         {
             return ProgramFlow::getFrame($this->frame)->getData($this->value)["type"];
         }
@@ -119,9 +119,39 @@ class InstructionArgument
         }
     }
 
-    public function isType(string $type): bool
+    public function isVar(): bool
     {
-        return $this->type === $type;
+        return $this->type === DataType::VAR;
+    }
+
+    public function isLabel(): bool
+    {
+        return $this->type === DataType::LABEL;
+    }
+
+    public function isType(): bool
+    {
+        return $this->type === DataType::TYPE;
+    }
+
+    public function isNil(): bool
+    {
+        return $this->type === DataType::NIL;
+    }
+
+    public function isBool(): bool
+    {
+        return $this->type === DataType::BOOL;
+    }
+
+    public function isInt(): bool
+    {
+        return $this->type === DataType::INT;
+    }
+
+    public function isString(): bool
+    {
+        return $this->type === DataType::STRING;
     }
 }
 

@@ -3,12 +3,30 @@
 namespace IPP\Student;
 
 use IPP\Core\Exception\InternalErrorException;
+use IPP\Core\StreamWriter;
+use IPP\Core\FileInputReader;
+use IPP\Core\FileSourceReader;
+
 
 require_once "Instruction.php";
 
 
 class InstructionFactory
 {
+    private FileSourceReader $sourceReader;
+    private FileInputReader $stdin;
+    private StreamWriter $stdout;
+    private StreamWriter $stderr;
+
+    public function __construct(FileSourceReader $sourceReader, FileInputReader $stdin, StreamWriter $stdout, StreamWriter $stderr)
+    {
+        $this->sourceReader = $sourceReader;
+        $this->stdin = $stdin;
+        $this->stdout = $stdout;
+        $this->stderr = $stderr;
+    }
+
+
     public function createInstruction(string $opcode, array $args): Instruction{
         switch ($opcode) {
             case OP_codes::MOVE:
@@ -54,9 +72,9 @@ class InstructionFactory
             case OP_codes::STRI2INT:
                 return new InstructionStri2Int($args);
             case OP_codes::READ:
-                return new InstructionRead($args);
+                return new InstructionRead($args, $this->stdin);
             case OP_codes::WRITE:
-                return new InstructionWrite($args);
+                return new InstructionWrite($args, $this->stdout);
             case OP_codes::CONCAT:
                 return new InstructionConcat($args);
             case OP_codes::STRLEN:
@@ -78,7 +96,7 @@ class InstructionFactory
             case OP_codes::EXIT:
                 return new InstructionExit($args);
             case OP_codes::DPRINT:
-                return new InstructionDprint($args);
+                return new InstructionDprint($args, $this->stderr);
             case OP_codes::BREAK:
                 return new InstructionBreak($args);
             default:

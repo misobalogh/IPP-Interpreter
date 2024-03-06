@@ -5,6 +5,7 @@ namespace IPP\Student;
 use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\WrongOperandTypeException;
 use IPP\Student\Exception\UndefinedVariableException;
+use IPP\Core\StreamWriter;
 
 #=========== Abstract class for instructions ===========
 
@@ -12,7 +13,7 @@ abstract class Instruction
 {
     protected array $args;
 
-    final public function __construct(array $args)
+    public function __construct(array $args)
     {
         $this->args = $args;
     }
@@ -44,7 +45,6 @@ class InstructionMove extends Instruction
         $frameSet = $this->args[0]->frame;
 
         ProgramFlow::GetFrame($frameSet)->setData($valueSet, $typeGet, $valueGet);
-        print_r(ProgramFlow::getGlobalFrame()->getAllData());        
         return 0;
     }
 }
@@ -78,7 +78,6 @@ class InstructionDefVar extends Instruction
     public function execute(): int{
         echo "DEFVAR\n";
         ProgramFlow::addToFrame($this->args[0]->frame, $this->args[0]->value, null, null);     
-        print_r(ProgramFlow::getGlobalFrame()->getAllData());  
         return 0;
     }
 }
@@ -233,9 +232,43 @@ class InstructionRead extends Instruction
 
 class InstructionWrite extends Instruction
 {
+    public function __construct(array $args, private StreamWriter $stdout)
+    {
+        parent::__construct($args);
+    }
+
     public function execute(): int{
-        echo "WRITE\n";
+        $this->checkArgs();
+        
+        $value = $this->args[0]->getValue();
+        $type = $this->args[0]->getType();
+
+        if ($type === DataType::NIL) {
+            $this->stdout->writeString("");            
+        }
+
+        else if ($type === DataType::BOOL) {
+            $this->stdout->writeBool($value);
+        }
+
+        else if ($type === DataType::INT) {
+            $this->stdout->writeInt($value);
+        }
+
+        else if ($type === DataType::STRING) {
+            // $this->stdout->writeString(stripcslashes($value));
+            $this->stdout->writeString(preg_replace_callback('/\\\\([0-9]{3})/', 
+                function ($matches) {
+                    return chr($matches[1]);
+                },
+                $value
+            ));
+        }
         return 0;
+    }
+
+    private function replace_ascii($matches) {
+        return chr($matches[1]);
     }
 }
 
@@ -246,7 +279,23 @@ class InstructionWrite extends Instruction
 class InstructionConcat extends Instruction
 {
     public function execute(): int{
-        echo "CONCAT\n";
+        $this->checkArgs();
+
+        $symbol1_value = $this->args[1]->getValue();
+        $symbol1_type = $this->args[1]->getType();
+
+        $symbol2_value = $this->args[2]->getValue();
+        $symbol2_type = $this->args[2]->getType();
+
+        if ($symbol1_type !== DataType::STRING || $symbol2_type !== DataType::STRING) {
+            throw new WrongOperandTypeException("Cannot concatenate non-strings");
+        }
+
+        $valueSet = $this->args[0]->value;
+
+        ProgramFlow::getGlobalFrame()->setData($valueSet, DataType::STRING, $symbol1_value . $symbol2_value);
+        
+        // echo "CONCAT\n";
         return 0;
     }
 }
@@ -303,7 +352,7 @@ class InstructionLabel extends Instruction
 class InstructionJump extends Instruction
 {
     public function execute(): int{
-        echo "JUMP\n";
+        // echo "JUMP\n";
         ProgramFlow::jumpTo($this->args[0]->value);
         return 0;
     }
@@ -328,7 +377,7 @@ class InstructionJumpIfEQ extends Instruction
             ProgramFlow::jumpTo($label);
         }
         
-        echo "JUMPIFEQ\n";
+        // echo "JUMPIFEQ\n";
 
         return 0;
     }
@@ -345,14 +394,14 @@ class InstructionJumpIfNEQ extends Instruction
         $symbol2_value = $this->args[2]->getValue();
         $symbol2_type = $this->args[2]->getType();    
 
-        if ($symbol1_type !== $symbol2_type && $symbol1_type !== "nil" && $symbol2_type !== "nil") {
+        if ($symbol1_type !== $symbol2_type && $symbol1_type !== DataType::NIL && $symbol2_type !== DataType::NIL) {
             throw new WrongOperandTypeException("Cannot compare different types");
         }
 
         if ($symbol1_value !== $symbol2_value) {
             ProgramFlow::jumpTo($label);
         }
-        echo "JUMPIFNEQ\n";
+        // echo "JUMPIFNEQ\n";
         return 0;
     }
 }
@@ -371,8 +420,37 @@ class InstructionExit extends Instruction
 
 class InstructionDprint extends Instruction
 {
+    public function __construct(array $args, private StreamWriter $stderr)
+    {
+        parent::__construct($args);
+    }
+
     public function execute(): int{
-        echo "DPRINT\n";
+        $this->checkArgs();
+        
+        $value = $this->args[0]->getValue();
+        $type = $this->args[0]->getType();
+
+        if ($type === DataType::NIL) {
+            $this->stderr->writeString("");            
+        }
+
+        else if ($type === DataType::BOOL) {
+            $this->stderr->writeBool($value);
+        }
+
+        else if ($type === DataType::INT) {
+            $this->stderr->writeInt($value);
+        }
+
+        else if ($type === DataType::STRING) {
+            $this->stderr->writeString(preg_replace_callback('/\\\\([0-9]{3})/', 
+                function ($matches) {
+                    return chr($matches[1]);
+                },
+                $value
+            ));
+        }
         return 0;
     }
 }
