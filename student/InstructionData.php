@@ -2,6 +2,7 @@
 
 namespace IPP\Student;
 
+use IPP\Student\Exception\SemanticErrorException;
 
 class InstructionData
 {
@@ -54,6 +55,7 @@ class InstructionData
 
 
 
+
 /**
  * Class InstructionArgument
  * 
@@ -75,26 +77,61 @@ class InstructionArgument
         $this->frame = $frame;
         $this->value = $value;
     }
+
+    public function isDefined(): bool
+    {
+        if ($this->type === DataType::VAR)
+        {
+            return ProgramFlow::getFrame($this->frame)->keyExists($this->value);
+        }
+        else if ($this->type === DataType::LABEL)
+        {
+            return ProgramFlow::labelExists($this->value);
+        }
+        else
+        {
+            return true;
+        }
+        
+    }
+
+    public function getValue()
+    {
+        if ($this->type === DataType::VAR)
+        {
+            return ProgramFlow::getFrame($this->frame)->getData($this->value)["value"];
+        }
+        else
+        {
+            return $this->value;
+        }
+    }
+
+    public function getType()
+    {
+        if ($this->type === DataType::VAR)
+        {
+            return ProgramFlow::getFrame($this->frame)->getData($this->value)["type"];
+        }
+        else
+        {
+            return $this->type;
+        }
+    }
+
+    public function isType(string $type): bool
+    {
+        return $this->type === $type;
+    }
 }
 
-class FrameType
+class DataType
 {
-    const GLOBAL = "GF";
-    const LOCAL = "LF";
-    const TEMPORARY = "TF";
-
-    public static function validFrameTypes(): array
-    {
-        return [
-            self::GLOBAL,
-            self::LOCAL,
-            self::TEMPORARY,
-        ];
-    }
-
-    public static function isFrameType(string $frameType): bool
-    {
-        return in_array($frameType, self::validFrameTypes());
-    }
-
+    const INT = "int";
+    const BOOL = "bool";
+    const STRING = "string";
+    const NIL = "nil";
+    const TYPE = "type";
+    const LABEL = "label";
+    const VAR = "var";
 }

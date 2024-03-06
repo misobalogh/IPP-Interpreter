@@ -4,6 +4,7 @@ namespace IPP\Student;
 
 use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\WrongOperandTypeException;
+use IPP\Student\Exception\UndefinedVariableException;
 
 #=========== Abstract class for instructions ===========
 
@@ -16,6 +17,15 @@ abstract class Instruction
         $this->args = $args;
     }
 
+    final public function checkArgs() : void
+    {
+        foreach ($this->args as $arg) {
+            if (!$arg->isDefined()) {
+                throw new UndefinedVariableException("Undefined variable");
+            }
+        }
+    }
+
     abstract public function execute(): int;
 }
 
@@ -25,10 +35,15 @@ abstract class Instruction
 class InstructionMove extends Instruction
 {
     public function execute(): int{
-        $valueGet = $this->args[1]->value;
+        $this->checkArgs();
+
+        $valueGet = $this->args[1]->getValue();
         $typeGet = $this->args[1]->type;
+        
+        $valueSet = $this->args[0]->value;
         $frameSet = $this->args[0]->frame;
-        ProgramFlow::GetFrame($frameSet)->setData($this->args[0]->value, $typeGet, $valueGet);
+
+        ProgramFlow::GetFrame($frameSet)->setData($valueSet, $typeGet, $valueGet);
         print_r(ProgramFlow::getGlobalFrame()->getAllData());        
         return 0;
     }
@@ -62,7 +77,8 @@ class InstructionDefVar extends Instruction
 {
     public function execute(): int{
         echo "DEFVAR\n";
-        ProgramFlow::addToFrame($this->args[0]->frame, $this->args[0]->value, null, null);       
+        ProgramFlow::addToFrame($this->args[0]->frame, $this->args[0]->value, null, null);     
+        print_r(ProgramFlow::getGlobalFrame()->getAllData());  
         return 0;
     }
 }
@@ -296,6 +312,21 @@ class InstructionJump extends Instruction
 class InstructionJumpIfEQ extends Instruction
 {
     public function execute(): int{
+        $label = $this->args[0]->value;
+
+        $symbol1_value = $this->args[1]->getValue();
+        $symbol1_type = $this->args[1]->getType();
+
+        $symbol2_value = $this->args[2]->getValue();
+        $symbol2_type = $this->args[2]->getType();    
+
+        if ($symbol1_type !== $symbol2_type && $symbol1_type !== DataType::NIL && $symbol2_type !== DataType::NIL) {
+            throw new WrongOperandTypeException("Cannot compare different types");
+        }
+
+        if ($symbol1_value === $symbol2_value) {
+            ProgramFlow::jumpTo($label);
+        }
         
         echo "JUMPIFEQ\n";
 
@@ -306,20 +337,13 @@ class InstructionJumpIfEQ extends Instruction
 class InstructionJumpIfNEQ extends Instruction
 {
     public function execute(): int{
-        $symbol1_type = $this->args[1]->type;
-        $symbol1_value = $this->args[1]->value;
-        $symbol2_type = $this->args[2]->type;
-        $symbol2_value = $this->args[2]->value;
         $label = $this->args[0]->value;
-        
 
-        // TODO make class var and if var, get value from frame
-        if ($symbol1_type === "var") {
-            $frame = $this->args[1]->frame;
-            $symbol1 = ProgramFlow::getFrame($frame)->getData($symbol1_value);
-            $symbol1_type = $symbol1["type"];
-            $symbol1_value = $symbol1["value"];
-        }
+        $symbol1_value = $this->args[1]->getValue();
+        $symbol1_type = $this->args[1]->getType();
+
+        $symbol2_value = $this->args[2]->getValue();
+        $symbol2_type = $this->args[2]->getType();    
 
         if ($symbol1_type !== $symbol2_type && $symbol1_type !== "nil" && $symbol2_type !== "nil") {
             throw new WrongOperandTypeException("Cannot compare different types");
@@ -329,8 +353,6 @@ class InstructionJumpIfNEQ extends Instruction
             ProgramFlow::jumpTo($label);
         }
         echo "JUMPIFNEQ\n";
-
-
         return 0;
     }
 }

@@ -91,7 +91,6 @@ class ProgramFlow
         }
     }
 
-
     public static function pushFrame(Frame $frame): void
     {
         array_push(self::$frames, $frame);
@@ -110,7 +109,7 @@ class ProgramFlow
     public static function addToLocalFrame(string $key, ?string $type, $value): void
     {
         $currentFrame = self::getCurrentFrame();
-        if (array_key_exists($key, $currentFrame->getAllData())) {
+        if ($currentFrame->keyExists($key)) {
             throw new SemanticErrorException("Rededfinition of variable $key");
         }
         else {
@@ -118,14 +117,9 @@ class ProgramFlow
         }
     }
 
-    // public static function isGlobalFrame(): bool
-    // {
-    //     return count(self::$frames) == 1;
-    // }
-
     public static function addToGlobalFrame(string $key, ?string $type, $value): void
     {
-        if (array_key_exists($key, self::$globalFrame->getAllData())) {
+        if (self::$globalFrame->keyExists($key)) {
             throw new SemanticErrorException("Rededfinition of variable $key");
         }
         else {
@@ -145,7 +139,7 @@ class ProgramFlow
 
     public static function addToTemporaryFrame(string $key, ?string $type, $value): void
     {
-        if (array_key_exists($key, self::$temporaryFrame->getAllData())) {
+        if (self::$temporaryFrame->keyExists($key)) {
             throw new SemanticErrorException("Rededfinition of variable $key");
         }
         else {
