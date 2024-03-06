@@ -72,7 +72,9 @@ class InstructionFactory
             case OP_codes::JUMP:
                 return new InstructionJump($args);
             case OP_codes::JUMPIFEQ:
-                return new InstructionJumpIfEq($args);
+                return new InstructionJumpIfEQ($args);
+            case OP_codes::JUMPIFNEQ:
+                return new InstructionJumpIfNEQ($args);
             case OP_codes::EXIT:
                 return new InstructionExit($args);
             case OP_codes::DPRINT:
@@ -121,6 +123,7 @@ class OP_codes {
     const LABEL = "LABEL";
     const JUMP = "JUMP";
     const JUMPIFEQ = "JUMPIFEQ";
+    const JUMPIFNEQ = "JUMPIFNEQ";
     const EXIT = "EXIT";
     const DPRINT = "DPRINT";
     const BREAK = "BREAK";

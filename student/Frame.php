@@ -11,11 +11,13 @@ class Frame
         $this->data = [];
     }
 
-    public function setData(string $key, $value): void
+    public function setData(string $key, ?string $type, $value): void
     {
-        $this->data[$key] = $value;
+        $this->data[$key] = [
+            "type" => $type,
+            "value" => $value
+        ];
     }
-
     public function getData(string $key)
     {
         return $this->data[$key] ?? null;
@@ -26,3 +28,4 @@ class Frame
         return $this->data;
     }
 }
+

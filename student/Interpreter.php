@@ -33,7 +33,7 @@ class Interpreter extends AbstractInterpreter
             $instructionData = $this->instructions[ProgramFlow::getPointer()];
             $instruction = $instructionFactory->createInstruction($instructionData->opcode, $instructionData->args);
             $instruction->execute();
-            print_r($instructionData);
+            // print_r($instructionData);
             ProgramFlow::increment();
             // echo "Pointer at: " . ProgramFlow::getPointer() . "\n";
         }

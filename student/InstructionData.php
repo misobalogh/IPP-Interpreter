@@ -2,6 +2,7 @@
 
 namespace IPP\Student;
 
+
 class InstructionData
 {
     public $instruction;
@@ -12,7 +13,6 @@ class InstructionData
     final public function __construct($instruction)
     {
         $this->instruction = $instruction;
-        print_r($this->instruction);
         $this->order = $this->getOrder();
         $this->opcode = $this->getOpcode();
         $this->args = $this->getArgs(); 
@@ -38,11 +38,11 @@ class InstructionData
                 $type = $arg->getAttribute('type');
                 $argName = $arg->nodeValue;
                 if (strpos($argName, '@') !== false) {
-                    list($frame, $value) = explode('@', $arg->value);
+                    list($frame, $value) = explode('@', $argName);
                 }
                 else {
                     $frame = null;
-                    $value = $arg->value;
+                    $value = $argName;
                 }
                 $args[] = new InstructionArgument($type, $frame, $value);
             }
@@ -77,3 +77,24 @@ class InstructionArgument
     }
 }
 
+class FrameType
+{
+    const GLOBAL = "GF";
+    const LOCAL = "LF";
+    const TEMPORARY = "TF";
+
+    public static function validFrameTypes(): array
+    {
+        return [
+            self::GLOBAL,
+            self::LOCAL,
+            self::TEMPORARY,
+        ];
+    }
+
+    public static function isFrameType(string $frameType): bool
+    {
+        return in_array($frameType, self::validFrameTypes());
+    }
+
+}
