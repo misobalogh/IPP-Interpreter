@@ -14,7 +14,9 @@ class ProgramFlow
     // private static array $dataStack;
     private static array $callStack;
     private static Frame $globalFrame;
-    private static Frame $temporaryFrame;
+    private static ?Frame $temporaryFrame;
+
+    public static int $executedInstructionCount = 0;
 
     public static function initialize($instructionList): void
     {
@@ -23,9 +25,10 @@ class ProgramFlow
         self::$labels = self::findLabels();
         self::$frames = [];
         self::$callStack = [];
+        self::$temporaryFrame = null;
         // global frame
         self::$globalFrame = new Frame();
-        self::pushFrame(self::$globalFrame);
+        // self::pushFrame(self::$globalFrame);
     }
 
     // IP
@@ -37,6 +40,7 @@ class ProgramFlow
     public static function increment(): void
     {
         self::$instructionPointer++;
+        self::$executedInstructionCount++;
     }
 
 
@@ -59,14 +63,14 @@ class ProgramFlow
         $labels = []; 
         foreach (self::$instructionList as $index => $instruction) {
             if ($instruction->opcode == "LABEL") {
-                $labels[$instruction->args[0]->value] = $index;
+                $labels[$instruction->arg1->value] = $index;
             }
         }
         return $labels;        
     }
     
     // FRAMES
-    public static function getFrame(string $frameType): Frame{
+    public static function getFrame(string $frameType): ?Frame{
         if ($frameType == FrameType::GLOBAL) {
             return self::$globalFrame;
         }
@@ -96,7 +100,7 @@ class ProgramFlow
         array_push(self::$frames, $frame);
     }
 
-    public static function popFrame(): Frame
+    public static function popFrame(): ?Frame
     {
         return array_pop(self::$frames);
     }

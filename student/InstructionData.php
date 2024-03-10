@@ -3,53 +3,65 @@
 namespace IPP\Student;
 
 use IPP\Student\Exception\SemanticErrorException;
+use IPP\Student\Exception\XMLStructureException;
 
 class InstructionData
 {
     public $instruction;
     public $order;
     public $opcode;
-    public $args;
+    public $arg1 = null;
+    public $arg2 = null;
+    public $arg3 = null;
 
     final public function __construct($instruction)
     {
         $this->instruction = $instruction;
-        $this->order = $this->getOrder();
-        $this->opcode = $this->getOpcode();
-        $this->args = $this->getArgs(); 
+        $this->setOrder();
+        $this->setOpcode();
+        $this->setArgs(); 
     }
 
-    private function getOrder()
+    private function setOrder()
     {
-        return (int)$this->instruction->getAttribute('order');
+        $this->order = (int)$this->instruction->getAttribute('order');
     }
 
-    private function getOpcode()
+    private function setOpcode()
     {
-        return $this->instruction->getAttribute('opcode'); 
+        $this->opcode = $this->instruction->getAttribute('opcode'); 
     }
 
-    private function getArgs()
+    private function setArgs()
     {
-        $args = array();
         $childNodes = $this->instruction->childNodes;
+
         foreach ($childNodes as $arg) {
-            // if element starts with arg (is one of arg1, arg2, arg3)
             if ($arg->nodeType === XML_ELEMENT_NODE && strpos($arg->nodeName, 'arg') === 0) {
                 $type = $arg->getAttribute('type');
                 $argName = $arg->nodeValue;
                 if ($type === DataType::VAR) {
                     list($frame, $value) = explode('@', $argName);
-                }
-                else {
+                } else {
                     $frame = null;
                     $value = $argName;
                 }
-                $args[] = new InstructionArgument($type, $frame, $value);
+
+                switch ($arg->nodeName) {
+                    case 'arg1':
+                        $this->arg1 = new InstructionArgument($type, $frame, $value);
+                        break;
+                    case 'arg2':
+                        $this->arg2 = new InstructionArgument($type, $frame, $value);
+                        break;
+                    case 'arg3':
+                        $this->arg3 = new InstructionArgument($type, $frame, $value);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-
-        return $args;
     }
 }
 
@@ -76,6 +88,9 @@ class InstructionArgument
         $this->type = $type;
         $this->frame = $frame;
         if ($type === DataType::INT) {
+            if (!is_numeric($value)) {
+                throw new XMLStructureException("Invalid value for int type");
+            }
             $this->value = (int)$value;
         }
         else if ($type === DataType::BOOL) {
@@ -87,9 +102,9 @@ class InstructionArgument
     }
 
     public function isDefined(): bool
-    {
+    {   
         if ($this->isVar())
-        {
+        {   
             return ProgramFlow::getFrame($this->frame)->keyExists($this->value) || ProgramFlow::getGlobalFrame()->keyExists($this->value);
         }
         else if ($this->isLabel())

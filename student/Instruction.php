@@ -6,23 +6,29 @@ use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\WrongOperandTypeException;
 use IPP\Student\Exception\UndefinedVariableException;
 use IPP\Student\Exception\OperandValueException;
+use IPP\Student\Exception\FrameAccessException;
 use IPP\Core\StreamWriter;
+use IPP\Core\FileInputReader;
 
 #=========== Abstract class for instructions ===========
 
 abstract class Instruction
 {
-    protected array $args;
+    protected ?InstructionArgument $arg1;
+    protected ?InstructionArgument $arg2;
+    protected ?InstructionArgument $arg3;
 
-    public function __construct(array $args)
+    public function __construct(InstructionData $instructionData)
     {
-        $this->args = $args;
+        $this->arg1 = $instructionData->arg1;
+        $this->arg2 = $instructionData->arg2;
+        $this->arg3 = $instructionData->arg3;
     }
 
     final public function checkArgs() : void
     {
-        foreach ($this->args as $arg) {
-            if (!$arg->isDefined()) {
+        foreach ([$this->arg1, $this->arg2, $this->arg3] as $arg) {
+            if ($arg !== null && !$arg->isDefined()) {
                 throw new UndefinedVariableException("Undefined variable");
             }
         }
@@ -39,12 +45,12 @@ class InstructionMove extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $valueGet = $this->args[1]->getValue();
-        $typeGet = $this->args[1]->type;
+        $valueGet = $this->arg2->getValue();
+        $typeGet = $this->arg2->type;
         
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
-
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
+        
         ProgramFlow::GetFrame($frameSet)->setData($valueSet, $typeGet, $valueGet);
         return 0;
     }
@@ -60,21 +66,26 @@ class InstructionCreateFrame extends Instruction
 class InstructionPushFrame extends Instruction
 {
     public function execute(): int{
-        return 0;
+        if (ProgramFlow::getFrame(FrameType::TEMPORARY) === null) {
+            throw new FrameAccessException("Undefined TF");
+        }
     }
 }
 
 class InstructionPopFrame extends Instruction
 {
     public function execute(): int{
-        return 0;
+        $frame = ProgramFlow::popFrame();
+        if ($frame === null) {
+            throw new FrameAccessException("Cannot pop frame from empty stack");
+        }
     }
 }
 
 class InstructionDefVar extends Instruction
 {
     public function execute(): int{
-        ProgramFlow::addToFrame($this->args[0]->frame, $this->args[0]->value, null, null);     
+        ProgramFlow::addToFrame($this->arg1->frame, $this->arg1->value, null, null);     
         return 0;
     }
 }
@@ -120,18 +131,18 @@ class InstructionAdd extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $symbol1_value = $this->args[1]->getValue();
-        $symbol1_type = $this->args[1]->getType();
+        $symbol1_value = $this->arg2->getValue();
+        $symbol1_type = $this->arg2->getType();
 
-        $symbol2_value = $this->args[2]->getValue();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol2_value = $this->arg3->getValue();
+        $symbol2_type = $this->arg3->getType();
 
         if ($symbol1_type !== DataType::INT || $symbol2_type !== DataType::INT) {
             throw new WrongOperandTypeException("ADD accepts only integers");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $symbol1_value + $symbol2_value);
         return 0;
@@ -143,18 +154,18 @@ class InstructionSub extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $symbol1_value = $this->args[1]->getValue();
-        $symbol1_type = $this->args[1]->getType();
+        $symbol1_value = $this->arg2->getValue();
+        $symbol1_type = $this->arg2->getType();
 
-        $symbol2_value = $this->args[2]->getValue();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol2_value = $this->arg3->getValue();
+        $symbol2_type = $this->arg3->getType();
 
         if ($symbol1_type !== DataType::INT || $symbol2_type !== DataType::INT) {
             throw new WrongOperandTypeException("SUB accepts only integers");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $symbol1_value - $symbol2_value);
 
@@ -167,18 +178,18 @@ class InstructionMul extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $symbol1_value = $this->args[1]->getValue();
-        $symbol1_type = $this->args[1]->getType();
+        $symbol1_value = $this->arg2->getValue();
+        $symbol1_type = $this->arg2->getType();
 
-        $symbol2_value = $this->args[2]->getValue();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol2_value = $this->arg3->getValue();
+        $symbol2_type = $this->arg3->getType();
 
         if ($symbol1_type !== DataType::INT || $symbol2_type !== DataType::INT) {
             throw new WrongOperandTypeException("MUL accepts only integers");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $symbol1_value * $symbol2_value);
 
@@ -191,11 +202,11 @@ class InstructionIDiv extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $symbol1_value = $this->args[1]->getValue();
-        $symbol1_type = $this->args[1]->getType();
+        $symbol1_value = $this->arg2->getValue();
+        $symbol1_type = $this->arg2->getType();
 
-        $symbol2_value = $this->args[2]->getValue();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol2_value = $this->arg3->getValue();
+        $symbol2_type = $this->arg3->getType();
 
         if ($symbol1_type !== DataType::INT || $symbol2_type !== DataType::INT) {
             throw new WrongOperandTypeException("IDIV accepts only integers");
@@ -205,8 +216,8 @@ class InstructionIDiv extends Instruction
             throw new OperandValueException("Division by zero");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, intdiv($symbol1_value, $symbol2_value));
         
@@ -219,8 +230,8 @@ class InstructionLt extends Instruction
     public function execute(): int{
         $this->checkArgs();
         
-        $symbol1_type = $this->args[1]->getType();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol1_type = $this->arg2->getType();
+        $symbol2_type = $this->arg3->getType();
         
         if ($symbol1_type === DataType::NIL || $symbol2_type === DataType::NIL) {
             throw new WrongOperandTypeException("Cannot compare with nil");
@@ -230,10 +241,10 @@ class InstructionLt extends Instruction
             throw new WrongOperandTypeException("Cannot compare different types");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
         
-        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() < $this->args[2]->getValue());
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() < $this->arg3->getValue());
 
         return 0;
     }
@@ -244,8 +255,8 @@ class InstructionGt extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $symbol1_type = $this->args[1]->getType();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol1_type = $this->arg2->getType();
+        $symbol2_type = $this->arg3->getType();
         
         if ($symbol1_type === DataType::NIL || $symbol2_type === DataType::NIL) {
             throw new WrongOperandTypeException("Cannot compare with nil");
@@ -255,10 +266,10 @@ class InstructionGt extends Instruction
             throw new WrongOperandTypeException("Cannot compare different types");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
         
-        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() > $this->args[2]->getValue());
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() > $this->arg3->getValue());
 
         return 0;
     }
@@ -268,17 +279,17 @@ class InstructionEq extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
-        $symbol1_type = $this->args[1]->getType();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol1_type = $this->arg2->getType();
+        $symbol2_type = $this->arg3->getType();
         
         if ($symbol1_type !== $symbol2_type) {
             throw new WrongOperandTypeException("Cannot compare different types");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
         
-        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() === $this->args[2]->getValue());
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() === $this->arg3->getValue());
 
         return 0;
     }
@@ -289,17 +300,17 @@ class InstructionAnd extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $symbol1_type = $this->args[1]->getType();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol1_type = $this->arg2->getType();
+        $symbol2_type = $this->arg3->getType();
         
         if ($symbol1_type !== DataType::BOOL || $symbol2_type !== DataType::BOOL) {
             throw new WrongOperandTypeException("AND accepts only booleans");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
         
-        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() && $this->args[2]->getValue());
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() && $this->arg3->getValue());
 
         return 0;
     }
@@ -310,17 +321,17 @@ class InstructionOr extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $symbol1_type = $this->args[1]->getType();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol1_type = $this->arg2->getType();
+        $symbol2_type = $this->arg3->getType();
         
         if ($symbol1_type !== DataType::BOOL || $symbol2_type !== DataType::BOOL) {
             throw new WrongOperandTypeException("OR accepts only booleans");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
         
-        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->args[1]->getValue() || $this->args[2]->getValue());
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() || $this->arg3->getValue());
 
         return 0;
     }
@@ -331,16 +342,16 @@ class InstructionNot extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $symbol1_type = $this->args[1]->getType();
+        $symbol1_type = $this->arg2->getType();
         
         if ($symbol1_type !== DataType::BOOL) {
             throw new WrongOperandTypeException("NOT accepts only booleans");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
         
-        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, !$this->args[1]->getValue());
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, !$this->arg2->getValue());
 
         return 0;
     }
@@ -366,23 +377,54 @@ class InstructionStri2Int extends Instruction
 
 class InstructionRead extends Instruction
 {
+    public function __construct(InstructionData $instructionData, private FileInputReader $stdin)
+    {
+        parent::__construct($instructionData);
+
+    }
+
     public function execute(): int{
+        $this->checkArgs();
+        
+        $type = $this->arg2->getValue();
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
+
+        if ($type === DataType::INT) {
+            $input = $this->stdin->readInt();
+        }
+
+        else if ($type === DataType::BOOL) {
+            $input = $this->stdin->readBool();
+        }
+
+        else if ($type === DataType::STRING) {
+            $input = $this->stdin->readString();
+        }
+
+        if ($input === false) {
+            ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::NIL, 'nil');
+            return 0;
+        }
+
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, $type, $input);
         return 0;
     }
 }
 
 class InstructionWrite extends Instruction
 {
-    public function __construct(array $args, private StreamWriter $stdout)
+    public function __construct(InstructionData $instructionData, private StreamWriter $stdout)
     {
-        parent::__construct($args);
+        parent::__construct($instructionData);
+
     }
 
     public function execute(): int{
         $this->checkArgs();
         
-        $value = $this->args[0]->getValue();
-        $type = $this->args[0]->getType();
+        $value = $this->arg1->getValue();
+        $type = $this->arg1->getType();
 
         if ($type === DataType::NIL) {
             $this->stdout->writeString("");            
@@ -405,6 +447,10 @@ class InstructionWrite extends Instruction
                 $value
             ));
         }
+        else if ($type === DataType::TYPE) {
+            $this->stdout->writeString($value);
+        }
+
         return 0;
     }
 
@@ -422,18 +468,18 @@ class InstructionConcat extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        $symbol1_value = $this->args[1]->getValue();
-        $symbol1_type = $this->args[1]->getType();
+        $symbol1_value = $this->arg2->getValue();
+        $symbol1_type = $this->arg2->getType();
 
-        $symbol2_value = $this->args[2]->getValue();
-        $symbol2_type = $this->args[2]->getType();
+        $symbol2_value = $this->arg3->getValue();
+        $symbol2_type = $this->arg3->getType();
 
         if ($symbol1_type !== DataType::STRING || $symbol2_type !== DataType::STRING) {
             throw new WrongOperandTypeException("Cannot concatenate other types than strings");
         }
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::STRING, $symbol1_value . $symbol2_value);
         
@@ -444,15 +490,15 @@ class InstructionConcat extends Instruction
 class InstructionStrlen extends Instruction
 {
     public function execute(): int{
-        $symbol1_type = $this->args[1]->getType();
+        $symbol1_type = $this->arg2->getType();
         if ($symbol1_type !== DataType::STRING) {
             throw new WrongOperandTypeException("STRLEN accepts only strings");
         }
 
-        $symbol1_vlaue = $this->args[1]->getValue();
+        $symbol1_vlaue = $this->arg2->getValue();
 
-        $valueSet = $this->args[0]->value;
-        $frameSet = $this->args[0]->frame;
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, strlen($symbol1_vlaue));
     }
@@ -482,14 +528,13 @@ class InstructionType extends Instruction
     public function execute(): int{
         $this->checkArgs();
         
-        $type = $this->args[1]->getType();
-        
-        $valueSet = $this->args[0]->value;
+        $type = $this->arg2->getType();
+        $valueSet = $this->arg1->value;
         if (!$type) {
             $valueSet = "";
         }
         
-        $frameSet = $this->args[0]->frame; 
+        $frameSet = $this->arg1->frame; 
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::TYPE, $type);
 
@@ -512,7 +557,7 @@ class InstructionLabel extends Instruction
 class InstructionJump extends Instruction
 {
     public function execute(): int{
-        ProgramFlow::jumpTo($this->args[0]->value);
+        ProgramFlow::jumpTo($this->arg1->value);
         return 0;
     }
 }
@@ -520,13 +565,13 @@ class InstructionJump extends Instruction
 class InstructionJumpIfEQ extends Instruction
 {
     public function execute(): int{
-        $label = $this->args[0]->value;
+        $label = $this->arg1->value;
 
-        $symbol1_value = $this->args[1]->getValue();
-        $symbol1_type = $this->args[1]->getType();
+        $symbol1_value = $this->arg2->getValue();
+        $symbol1_type = $this->arg2->getType();
 
-        $symbol2_value = $this->args[2]->getValue();
-        $symbol2_type = $this->args[2]->getType();    
+        $symbol2_value = $this->arg3->getValue();
+        $symbol2_type = $this->arg3->getType();    
 
         if ($symbol1_type !== $symbol2_type && $symbol1_type !== DataType::NIL && $symbol2_type !== DataType::NIL) {
             throw new WrongOperandTypeException("Cannot compare different types");
@@ -543,13 +588,13 @@ class InstructionJumpIfEQ extends Instruction
 class InstructionJumpIfNEQ extends Instruction
 {
     public function execute(): int{
-        $label = $this->args[0]->value;
+        $label = $this->arg1->value;
 
-        $symbol1_value = $this->args[1]->getValue();
-        $symbol1_type = $this->args[1]->getType();
+        $symbol1_value = $this->arg2->getValue();
+        $symbol1_type = $this->arg2->getType();
 
-        $symbol2_value = $this->args[2]->getValue();
-        $symbol2_type = $this->args[2]->getType();    
+        $symbol2_value = $this->arg3->getValue();
+        $symbol2_type = $this->arg3->getType();    
 
         if ($symbol1_type !== $symbol2_type && $symbol1_type !== DataType::NIL && $symbol2_type !== DataType::NIL) {
             throw new WrongOperandTypeException("Cannot compare different types");
@@ -567,15 +612,15 @@ class InstructionExit extends Instruction
     public function execute(): int{
         $this->checkArgs();
 
-        if ($this->args[0]->getType() !== DataType::INT) {
+        if ($this->arg1->getType() !== DataType::INT) {
             throw new WrongOperandTypeException("EXIT accepts only integers");
         }
 
-        if ($this->args[0]->getValue() < 0 || $this->args[0]->getValue() > 9) {
+        if ($this->arg1->getValue() < 0 || $this->arg1->getValue() > 9) {
             throw new OperandValueException("EXIT accepts only integers in range 0-9");
         }
 
-        ProgramFlow::exit($this->args[0]->getValue());
+        ProgramFlow::exit($this->arg1->getValue());
     }
 }
 
@@ -585,16 +630,16 @@ class InstructionExit extends Instruction
 
 class InstructionDprint extends Instruction
 {
-    public function __construct(array $args, private StreamWriter $stderr)
+    public function __construct(InstructionData $instructionData, private StreamWriter $stderr)
     {
-        parent::__construct($args);
+        parent::__construct($instructionData);
     }
 
     public function execute(): int{
         $this->checkArgs();
         
-        $value = $this->args[0]->getValue();
-        $type = $this->args[0]->getType();
+        $value = $this->arg1->getValue();
+        $type = $this->arg1->getType();
 
         if ($type === DataType::NIL) {
             $this->stderr->writeString("");            
@@ -622,9 +667,9 @@ class InstructionDprint extends Instruction
 
 class InstructionBreak extends Instruction
 {
-    public function __construct(array $args, private StreamWriter $stderr)
+    public function __construct(InstructionData $instructionData, private StreamWriter $stderr)
     {
-        parent::__construct($args);
+        parent::__construct($instructionData);
     }
 
     public function execute(): int{
