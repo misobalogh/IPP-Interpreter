@@ -8,16 +8,30 @@ use IPP\Student\Exception\SemanticErrorException;
 class ProgramFlow
 {
     private static int $instructionPointer;
+    /**
+     * @var InstructionData[]
+     */
     private static array $instructionList;
+    /**
+     * @var string[]
+     */
     private static array $labels;
+    /**
+     * @var Frame[]
+     */
     private static array $frames;
-    // private static array $dataStack;
+    /**
+     * @var Frame[]
+     */
     private static array $callStack;
     private static Frame $globalFrame;
     private static ?Frame $temporaryFrame;
 
     public static int $executedInstructionCount = 0;
 
+    /**
+     * @param InstructionData[] $instructionList
+     */
     public static function initialize($instructionList): void
     {
         self::$instructionPointer = 0;
@@ -55,9 +69,19 @@ class ProgramFlow
         if (!array_key_exists($label, self::$labels)) {
             throw new SemanticErrorException("Label $label not found");
         }
-        return self::$labels[$label];
+        return  (int)self::$labels[$label];
     }
 
+    public static function labelExists(string $label) : bool {
+        if (self::getLabel($label) == null) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return string[]
+     */
     private static function findLabels(): array
     {
         $labels = []; 
@@ -82,6 +106,13 @@ class ProgramFlow
         }
     } 
 
+
+    /**
+     * @param string $frameType
+     * @param string $key
+     * @param string|null $type
+     * @param mixed $value
+     */
     public static function addToFrame(string $frameType, string $key, ?string $type, $value): void
     {
         if ($frameType == FrameType::GLOBAL) {
@@ -110,6 +141,11 @@ class ProgramFlow
         return end(self::$frames);
     }
 
+    /**
+     * @param string $key
+     * @param string|null $type
+     * @param mixed $value
+     */
     public static function addToLocalFrame(string $key, ?string $type, $value): void
     {
         $currentFrame = self::getCurrentFrame();
@@ -121,6 +157,11 @@ class ProgramFlow
         }
     }
 
+    /**
+     * @param string $key
+     * @param string|null $type
+     * @param mixed $value
+     */
     public static function addToGlobalFrame(string $key, ?string $type, $value): void
     {
         if (self::$globalFrame->keyExists($key)) {
@@ -141,6 +182,11 @@ class ProgramFlow
         self::$temporaryFrame = new Frame();
     }
 
+    /**
+     * @param string $key
+     * @param string|null $type
+     * @param mixed $value
+     */
     public static function addToTemporaryFrame(string $key, ?string $type, $value): void
     {
         if (self::$temporaryFrame->keyExists($key)) {
@@ -151,7 +197,11 @@ class ProgramFlow
         }
     }
 
-    public static function getFromTemporaryFrame(string $key)
+    /**
+     * @param string $key
+     * @return array<string, mixed>|null
+     */
+    public static function getFromTemporaryFrame(string $key) : ?array
     {
         return self::$temporaryFrame->getData($key);
     }    
@@ -161,7 +211,7 @@ class ProgramFlow
         self::$temporaryFrame = null;
     }
 
-    public static function continue(): int
+    public static function continue(): bool
     {
         return self::$instructionPointer < count(self::$instructionList);
     }

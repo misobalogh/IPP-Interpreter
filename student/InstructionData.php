@@ -7,13 +7,23 @@ use IPP\Student\Exception\XMLStructureException;
 
 class InstructionData
 {
+    /** @var \DOMElement */
     public $instruction;
+    /** @var int */
     public $order;
+    /** @var string */
     public $opcode;
+    /** @var InstructionArgument */
     public $arg1 = null;
+    /** @var InstructionArgument */
     public $arg2 = null;
+    /** @var InstructionArgument */
     public $arg3 = null;
 
+    /**
+     * InstructionData constructor.
+     * @param \DOMElement $instruction
+     */
     final public function __construct($instruction)
     {
         $this->instruction = $instruction;
@@ -22,22 +32,22 @@ class InstructionData
         $this->setArgs(); 
     }
 
-    private function setOrder()
+    private function setOrder() : void
     {
         $this->order = (int)$this->instruction->getAttribute('order');
     }
 
-    private function setOpcode()
+    private function setOpcode() : void
     {
         $this->opcode = $this->instruction->getAttribute('opcode'); 
     }
 
-    private function setArgs()
+    private function setArgs() : void
     {
         $childNodes = $this->instruction->childNodes;
 
         foreach ($childNodes as $arg) {
-            if ($arg->nodeType === XML_ELEMENT_NODE && strpos($arg->nodeName, 'arg') === 0) {
+            if ($arg->nodeType === XML_ELEMENT_NODE && strpos($arg->nodeName, 'arg') === 0 && $arg instanceof \DOMElement) {
                 $type = $arg->getAttribute('type');
                 $argName = $arg->nodeValue;
                 if ($type === DataType::VAR) {
@@ -75,15 +85,22 @@ class InstructionData
  *
  * @property string $type
  * @property string $frame
- * @property string $value
+ * @property int|bool|string $value
  */
 class InstructionArgument
 {
     public string $type;
     public ?string $frame;
+    /** @var int|bool|string */
     public $value;
 
-    public function __construct(string $type, ?string $frame, string $value)
+    /**
+     * InstructionArgument constructor.
+     * @param string $type
+     * @param string|null $frame
+     * @param int|bool|string $value
+     */
+    public function __construct(string $type, ?string $frame, $value)
     {
         $this->type = $type;
         $this->frame = $frame;
@@ -118,7 +135,7 @@ class InstructionArgument
         
     }
 
-    public function getValue()
+    public function getValue() : mixed
     {
         if ($this->isVar())
         {
@@ -130,7 +147,7 @@ class InstructionArgument
         }
     }
 
-    public function getType()
+    public function getType() : mixed
     {
         if ($this->isVar())
         {

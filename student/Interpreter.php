@@ -11,23 +11,20 @@ use IPP\Student\Exception\XMLStructureException;
 
 class Interpreter extends AbstractInterpreter
 {
+    /**
+     * @var InstructionData[]
+     */
     private array $instructions;
 
     public function execute(): int
     {
-        // TODO: Start your code here
-        // Check \IPP\Core\AbstractInterpreter for predefined I/O objects:
-        // $dom = $this->source->getDOMDocument();
-        // $val = $this->input->readString();
-        // $this->stdout->writeString("stdout");
-        // $this->stderr->writeString("stderr");
-
         $dom = $this->source->getDOMDocument();
         $this->checkHeader($dom);
         
         $this->setInstructionsData($dom);
-        
-        $instructionFactory = new InstructionFactory($this->source, $this->input, $this->stdout, $this->stderr);
+
+        /** @phpstan-ignore-next-line */
+        $instructionFactory = new InstructionFactory($this->input, $this->stdout, $this->stderr);
 
         ProgramFlow::initialize($this->instructions);
 
@@ -42,12 +39,16 @@ class Interpreter extends AbstractInterpreter
         return 0;
     }
 
-    private function usortInstructions($inst1, $inst2)
+    private function usortInstructions(InstructionData $inst1, InstructionData $inst2) : int
     {
         return $inst1->order - $inst2->order;
     }
 
-    private function setInstructionsData($dom)
+    /**
+     * @param \DOMDocument $dom
+     * @throws XMLStructureException
+     */
+    private function setInstructionsData($dom) : void
     {
         $instructionsArray = array();
         foreach ($dom->getElementsByTagName('instruction') as $instruction) {
@@ -82,7 +83,11 @@ class Interpreter extends AbstractInterpreter
         $this->instructions = $instructionsArray;
     } 
     
-    private function checkHeader($dom)
+    /**
+     * @param \DOMDocument $dom
+     * @throws XMLStructureException
+     */
+    private function checkHeader($dom) : void
     {
         $rootElement = $dom->documentElement;
         if ($rootElement->nodeName !== 'program' || $rootElement->getAttribute('language') !== 'IPPcode24') {

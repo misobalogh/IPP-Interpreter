@@ -69,6 +69,7 @@ class InstructionPushFrame extends Instruction
         if (ProgramFlow::getFrame(FrameType::TEMPORARY) === null) {
             throw new FrameAccessException("Undefined TF");
         }
+        return 0;
     }
 }
 
@@ -79,6 +80,7 @@ class InstructionPopFrame extends Instruction
         if ($frame === null) {
             throw new FrameAccessException("Cannot pop frame from empty stack");
         }
+        return 0;
     }
 }
 
@@ -401,6 +403,9 @@ class InstructionRead extends Instruction
         else if ($type === DataType::STRING) {
             $input = $this->stdin->readString();
         }
+        else {
+            $input = false;
+        }
 
         if ($input === false) {
             ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::NIL, 'nil');
@@ -442,7 +447,7 @@ class InstructionWrite extends Instruction
             // $this->stdout->writeString(stripcslashes($value));
             $this->stdout->writeString(preg_replace_callback('/\\\\([0-9]{3})/', 
                 function ($matches) {
-                    return chr($matches[1]);
+                    return chr((int)$matches[1]);
                 },
                 $value
             ));
@@ -452,10 +457,6 @@ class InstructionWrite extends Instruction
         }
 
         return 0;
-    }
-
-    private function replace_ascii($matches) {
-        return chr($matches[1]);
     }
 }
 
@@ -501,6 +502,8 @@ class InstructionStrlen extends Instruction
         $frameSet = $this->arg1->frame;
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, strlen($symbol1_vlaue));
+        
+        return 0;
     }
 }
 
@@ -621,6 +624,8 @@ class InstructionExit extends Instruction
         }
 
         ProgramFlow::exit($this->arg1->getValue());
+
+        return 0;
     }
 }
 
@@ -656,7 +661,7 @@ class InstructionDprint extends Instruction
         else if ($type === DataType::STRING) {
             $this->stderr->writeString(preg_replace_callback('/\\\\([0-9]{3})/', 
                 function ($matches) {
-                    return chr($matches[1]);
+                    return chr((int)$matches[1]);
                 },
                 $value
             ));

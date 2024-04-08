@@ -4,6 +4,9 @@ namespace IPP\Student;
 
 class Frame 
 {
+    /**
+     * @var array<string, mixed> $data
+     */
     private array $data;
 
     public function __construct()
@@ -11,7 +14,7 @@ class Frame
         $this->data = [];
     }
 
-    public function setData(string $key, ?string $type, $value): void
+    public function setData(string $key, ?string $type, mixed $value): void
     {
         $this->data[$key] = [
             "type" => $type,
@@ -19,11 +22,15 @@ class Frame
         ];
     }
 
-    public function getData(string $key)
+    public function getData(string $key) : mixed
     {
         return $this->data[$key] ?? null;
     }
 
+
+    /**
+     * @return array<string, mixed>>
+     */
     public function getAllData(): array
     {
         return $this->data;
@@ -42,6 +49,9 @@ class FrameType
     const LOCAL = "LF";
     const TEMPORARY = "TF";
 
+    /**
+     * @return array<string>
+     */
     public static function validFrameTypes(): array
     {
         return [

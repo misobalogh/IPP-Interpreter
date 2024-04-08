@@ -13,14 +13,12 @@ require_once "Instruction.php";
 
 class InstructionFactory
 {
-    private FileSourceReader $sourceReader;
     private FileInputReader $stdin;
     private StreamWriter $stdout;
     private StreamWriter $stderr;
 
-    public function __construct(FileSourceReader $sourceReader, FileInputReader $stdin, StreamWriter $stdout, StreamWriter $stderr)
+    public function __construct(FileInputReader $stdin, StreamWriter $stdout, StreamWriter $stderr)
     {
-        $this->sourceReader = $sourceReader;
         $this->stdin = $stdin;
         $this->stdout = $stdout;
         $this->stderr = $stderr;
@@ -99,7 +97,7 @@ class InstructionFactory
             case OP_codes::DPRINT:
                 return new InstructionDprint($instructionData, $this->stderr);
             case OP_codes::BREAK:
-                return new InstructionBreak($instructionData);
+                return new InstructionBreak($instructionData, $this->stderr);
             default:
                 throw new InternalErrorException("Unknown opcode: $opcode");
         }
