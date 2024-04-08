@@ -87,6 +87,9 @@ class ProgramFlow
         $labels = []; 
         foreach (self::$instructionList as $index => $instruction) {
             if ($instruction->opcode == "LABEL") {
+                if (array_key_exists($instruction->arg1->value, $labels)) {
+                    throw new SemanticErrorException("Label {$instruction->arg1->value} already defined");
+                }
                 $labels[$instruction->arg1->value] = $index;
             }
         }

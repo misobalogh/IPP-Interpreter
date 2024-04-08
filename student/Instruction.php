@@ -7,6 +7,7 @@ use IPP\Student\Exception\WrongOperandTypeException;
 use IPP\Student\Exception\UndefinedVariableException;
 use IPP\Student\Exception\OperandValueException;
 use IPP\Student\Exception\FrameAccessException;
+use IPP\Student\Exception\XMLStructureException;
 use IPP\Core\StreamWriter;
 use IPP\Core\FileInputReader;
 
@@ -44,6 +45,9 @@ class InstructionMove extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 == null || $this->arg2 == null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $valueGet = $this->arg2->getValue();
         $typeGet = $this->arg2->type;
@@ -86,7 +90,10 @@ class InstructionPopFrame extends Instruction
 
 class InstructionDefVar extends Instruction
 {
-    public function execute(): int{
+    public function execute(): int {
+        if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
         ProgramFlow::addToFrame($this->arg1->frame, $this->arg1->value, null, null);     
         return 0;
     }
@@ -132,6 +139,9 @@ class InstructionAdd extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $symbol1_value = $this->arg2->getValue();
         $symbol1_type = $this->arg2->getType();
@@ -155,6 +165,9 @@ class InstructionSub extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $symbol1_value = $this->arg2->getValue();
         $symbol1_type = $this->arg2->getType();
@@ -179,6 +192,9 @@ class InstructionMul extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $symbol1_value = $this->arg2->getValue();
         $symbol1_type = $this->arg2->getType();
@@ -203,6 +219,9 @@ class InstructionIDiv extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $symbol1_value = $this->arg2->getValue();
         $symbol1_type = $this->arg2->getType();
@@ -231,6 +250,9 @@ class InstructionLt extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
         
         $symbol1_type = $this->arg2->getType();
         $symbol2_type = $this->arg3->getType();
@@ -256,6 +278,9 @@ class InstructionGt extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $symbol1_type = $this->arg2->getType();
         $symbol2_type = $this->arg3->getType();
@@ -281,6 +306,9 @@ class InstructionEq extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
         $symbol1_type = $this->arg2->getType();
         $symbol2_type = $this->arg3->getType();
         
@@ -301,6 +329,9 @@ class InstructionAnd extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $symbol1_type = $this->arg2->getType();
         $symbol2_type = $this->arg3->getType();
@@ -322,6 +353,9 @@ class InstructionOr extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $symbol1_type = $this->arg2->getType();
         $symbol2_type = $this->arg3->getType();
@@ -343,6 +377,9 @@ class InstructionNot extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $symbol1_type = $this->arg2->getType();
         
@@ -387,6 +424,9 @@ class InstructionRead extends Instruction
 
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
         
         $type = $this->arg2->getValue();
         $valueSet = $this->arg1->value;
@@ -426,7 +466,10 @@ class InstructionWrite extends Instruction
     }
 
     public function execute(): int{
-        $this->checkArgs();
+        $this->checkArgs();       
+        if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
         
         $value = $this->arg1->getValue();
         $type = $this->arg1->getType();
@@ -468,6 +511,9 @@ class InstructionConcat extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         $symbol1_value = $this->arg2->getValue();
         $symbol1_type = $this->arg2->getType();
@@ -491,6 +537,10 @@ class InstructionConcat extends Instruction
 class InstructionStrlen extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
         $symbol1_type = $this->arg2->getType();
         if ($symbol1_type !== DataType::STRING) {
             throw new WrongOperandTypeException("STRLEN accepts only strings");
@@ -530,6 +580,9 @@ class InstructionType extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
         
         $type = $this->arg2->getType();
         $valueSet = $this->arg1->value;
@@ -560,6 +613,10 @@ class InstructionLabel extends Instruction
 class InstructionJump extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
         ProgramFlow::jumpTo($this->arg1->value);
         return 0;
     }
@@ -568,6 +625,10 @@ class InstructionJump extends Instruction
 class InstructionJumpIfEQ extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
         $label = $this->arg1->value;
 
         $symbol1_value = $this->arg2->getValue();
@@ -591,6 +652,10 @@ class InstructionJumpIfEQ extends Instruction
 class InstructionJumpIfNEQ extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
         $label = $this->arg1->value;
 
         $symbol1_value = $this->arg2->getValue();
@@ -614,6 +679,9 @@ class InstructionExit extends Instruction
 {
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
 
         if ($this->arg1->getType() !== DataType::INT) {
             throw new WrongOperandTypeException("EXIT accepts only integers");
@@ -642,6 +710,9 @@ class InstructionDprint extends Instruction
 
     public function execute(): int{
         $this->checkArgs();
+        if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
         
         $value = $this->arg1->getValue();
         $type = $this->arg1->getType();

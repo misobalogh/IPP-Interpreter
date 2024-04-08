@@ -19,11 +19,11 @@ class Interpreter extends AbstractInterpreter
     public function execute(): int
     {
         $dom = $this->source->getDOMDocument();
+
         $this->checkHeader($dom);
         
         $this->setInstructionsData($dom);
 
-        /** @phpstan-ignore-next-line */
         $instructionFactory = new InstructionFactory($this->input, $this->stdout, $this->stderr);
 
         ProgramFlow::initialize($this->instructions);

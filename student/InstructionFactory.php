@@ -3,6 +3,7 @@
 namespace IPP\Student;
 
 use IPP\Core\Exception\InternalErrorException;
+use IPP\Student\Exception\XMLStructureException;
 use IPP\Core\StreamWriter;
 use IPP\Core\FileInputReader;
 use IPP\Core\FileSourceReader;
@@ -99,7 +100,7 @@ class InstructionFactory
             case OP_codes::BREAK:
                 return new InstructionBreak($instructionData, $this->stderr);
             default:
-                throw new InternalErrorException("Unknown opcode: $opcode");
+                throw new XMLStructureException("Unknown opcode: $opcode");
         }
     }
 }
