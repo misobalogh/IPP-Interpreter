@@ -48,23 +48,45 @@ class InstructionData
 
         foreach ($childNodes as $arg) {
             if ($arg->nodeType === XML_ELEMENT_NODE && strpos($arg->nodeName, 'arg') === 0 && $arg instanceof \DOMElement) {
-                $type = $arg->getAttribute('type');
-                $argName = $arg->nodeValue;
-                if ($type === DataType::VAR) {
-                    list($frame, $value) = explode('@', $argName);
-                } else {
-                    $frame = null;
-                    $value = $argName;
+                $type = trim($arg->getAttribute('type'));
+                if (!in_array($type, [DataType::INT, DataType::BOOL, DataType::STRING, DataType::NIL, DataType::TYPE, DataType::LABEL, DataType::VAR])) {
+                    throw new XMLStructureException("Invalid argument type");
                 }
+                $argName = trim($arg->nodeValue);
+                if ($argName !== '') {
+                    if ($type === DataType::VAR) {
+                        list($frame, $value) = array_map('trim', explode('@', $argName));
+                        if (!in_array($frame, ['GF', 'LF', 'TF'])) {
+                            throw new XMLStructureException("Invalid frame");
+                        }
+                    } else {
+                        $frame = null;
+                        $value = $argName;
+                    }
+
+                } else {
+                    throw new XMLStructureException("Argument value is empty");
+                }
+
+               
 
                 switch ($arg->nodeName) {
                     case 'arg1':
+                        if ($this->arg1 !== null) {
+                            throw new XMLStructureException("Multiple arg1 arguments");
+                        }
                         $this->arg1 = new InstructionArgument($type, $frame, $value);
                         break;
                     case 'arg2':
+                        if ($this->arg2 !== null) {
+                            throw new XMLStructureException("Multiple arg2 arguments");
+                        }
                         $this->arg2 = new InstructionArgument($type, $frame, $value);
                         break;
                     case 'arg3':
+                        if ($this->arg3 !== null) {
+                            throw new XMLStructureException("Multiple arg3 arguments");
+                        }
                         $this->arg3 = new InstructionArgument($type, $frame, $value);
                         break;
                     default:

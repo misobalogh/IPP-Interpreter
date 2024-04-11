@@ -28,7 +28,7 @@ class InstructionFactory
 
     public function createInstruction(InstructionData $instructionData): Instruction{
         $opcode = $instructionData->opcode;
-        switch ($opcode) {
+        switch (strtoupper($opcode)) {
             case OP_codes::MOVE:
                 return new InstructionMove($instructionData);
             case OP_codes::CREATEFRAME:

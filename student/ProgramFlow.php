@@ -3,6 +3,7 @@
 namespace IPP\Student;
 
 use IPP\Student\Exception\SemanticErrorException;
+use IPP\Student\Exception\FrameAccessException;
 
 
 class ProgramFlow
@@ -51,11 +52,33 @@ class ProgramFlow
         return self::$instructionPointer;
     }
 
+    public static function setPointer(int $pointer): void
+    {
+        self::$instructionPointer = $pointer;
+    }
+
     public static function increment(): void
     {
         self::$instructionPointer++;
         self::$executedInstructionCount++;
     }
+
+    public static function pushToCallStack(int $instructionPointer): void
+    {
+        array_push(self::$callStack, $instructionPointer);
+    }
+
+    public static function popFromCallStack(): ?int
+    {
+        return array_pop(self::$callStack);
+    }
+
+    public static function getInstruction(): InstructionData
+    {
+        return self::$instructionList[self::$instructionPointer];
+    }
+
+
 
 
     //  LABELS
@@ -139,9 +162,13 @@ class ProgramFlow
         return array_pop(self::$frames);
     }
 
-    public static function getCurrentFrame(): Frame
+    public static function getCurrentFrame(): ?Frame
     {
-        return end(self::$frames);
+        $frameToReturn = end(self::$frames);
+        if ($frameToReturn === false) {
+            return null;
+        }
+        return $frameToReturn;
     }
 
     /**
@@ -152,6 +179,10 @@ class ProgramFlow
     public static function addToLocalFrame(string $key, ?string $type, $value): void
     {
         $currentFrame = self::getCurrentFrame();
+        if ($currentFrame === null) {
+            throw new FrameAccessException("No frame to add variable $key");
+        }
+
         if ($currentFrame->keyExists($key)) {
             throw new SemanticErrorException("Rededfinition of variable $key");
         }
@@ -168,7 +199,7 @@ class ProgramFlow
     public static function addToGlobalFrame(string $key, ?string $type, $value): void
     {
         if (self::$globalFrame->keyExists($key)) {
-            throw new SemanticErrorException("Rededfinition of variable $key");
+            throw new SemanticErrorException("Redefinition of variable $key");
         }
         else {
             self::$globalFrame->setData($key, $type, $value);
@@ -180,9 +211,19 @@ class ProgramFlow
         return self::$globalFrame;
     }   
 
-    public static function createTemporaryFrame(): void
+    public static function setTemporaryFrame(Frame $frame): void
     {
-        self::$temporaryFrame = new Frame();
+        self::$temporaryFrame = $frame;
+    }
+
+    public static function deleteTemporaryFrame(): void
+    {
+        self::$temporaryFrame = null;
+    }
+
+    public static function getTemporaryFrame(): ?Frame
+    {
+        return self::$temporaryFrame;
     }
 
     /**
