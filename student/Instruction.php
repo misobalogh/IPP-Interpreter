@@ -429,12 +429,6 @@ class InstructionNot extends Instruction
 class InstructionInt2Char extends Instruction
 {
     public function execute(): int{
-        /*
-        INT2CHAR ⟨var⟩ ⟨symb⟩ Převod celého čísla na znak
-        Číselná hodnota ⟨symb⟩ je dle Unicode převedena na znak, který tvoří jednoznakový řetězec
-        přiřazený do ⟨var⟩. Není-li ⟨symb⟩ validní ordinální hodnota znaku v Unicode (viz funkce mb_chr
-        v PHP 8), dojde k chybě 58.
-        */
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -463,6 +457,39 @@ class InstructionInt2Char extends Instruction
 class InstructionStri2Int extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+
+        if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
+            throw new XMLStructureException("Missing argument");
+        }
+
+        $symbol1_type = $this->arg2->getType();
+        if ($symbol1_type !== DataType::STRING) {
+            throw new WrongOperandTypeException("Cannot get char from other type than string");
+        }
+
+        $symbol2_type = $this->arg3->getType();
+        if ($symbol2_type !== DataType::INT) {
+            throw new WrongOperandTypeException("Cannot index with other type than integer");
+        }
+
+        $symbol1_value = $this->arg2->getValue();
+        $symbol2_value = $this->arg3->getValue();
+
+        if ($symbol2_value < 0 || $symbol2_value >= strlen($symbol1_value)) {
+            throw new StringOperationException("Index out of range");
+        }
+
+        $converted = mb_ord($symbol1_value);
+        if ($converted === false) {
+            throw new StringOperationException("Error during conversion");
+        }
+
+        $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
+
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $converted);
+
         return 0;
     }
 }
@@ -485,19 +512,23 @@ class InstructionRead extends Instruction
             throw new XMLStructureException("Missing argument");
         }
         
+        if (!$this->arg2->isType()) {
+            throw new XMLStructureException("Invalid argument type");
+        }
+
         $type = $this->arg2->getValue();
         $valueSet = $this->arg1->value;
         $frameSet = $this->arg1->frame;
 
-        if ($type === DataType::INT) {
+        if (strtoupper($type) === DataType::INT) {
             $input = $this->stdin->readInt();
         }
 
-        else if ($type === DataType::BOOL) {
+        else if (strtoupper($type) === DataType::BOOL) {
             $input = $this->stdin->readBool();
         }
 
-        else if ($type === DataType::STRING) {
+        else if (strtoupper($type) === DataType::STRING) {
             $input = $this->stdin->readString();
         }
         else {
@@ -672,14 +703,10 @@ class InstructionSetChar extends Instruction
         $frameSet = $this->arg1->frame;
 
         $symbol1_value = (int)$symbol1_value;
-        if ($symbol1_value < 0) {
-            throw new StringOperationException("Index out of range");
-        }
-
         $symbol2_value = (string)$symbol2_value;
-        if ($symbol1_value >= strlen($symbol2_value)) {
+        if ($symbol1_value < 0 || $symbol1_value >= strlen($symbol2_value)) {
             throw new StringOperationException("Index out of range");
-        }
+        } 
 
         $symbol2_value[$symbol1_value] = $symbol2_value;
 
