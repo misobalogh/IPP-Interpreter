@@ -264,13 +264,13 @@
 
             @keyframes left{  
                 100%{
-                    transform: rotate(176deg);
+                    transform: rotate(180deg);
                     
                 }
             }
             @keyframes right{
                 100%{
-                    transform: rotate(176deg);
+                    transform: rotate(180deg);
                 }
             }
             @keyframes colors{
@@ -448,7 +448,7 @@
                 <div id="percent">
                     <div class="circular">
                         <div class="inner"></div>
-                        <div id="num" class="number">98%</div>
+                        <div id="num" class="number">100%</div>
                         <div class="circle">
                             <div class="bar left">
                                 <div class="progress"></div>
@@ -470,13 +470,13 @@
                                 <td class="text_right">
                                     Tests Passed:
                                 </td>
-                                <td id="pass">52</td>
+                                <td id="pass">53</td>
                             </tr>
                             <tr>
                                 <td class="text_right">
                                     Tests Failed:
                                 </td>
-                                <td id="fail">1</td>
+                                <td id="fail">0</td>
                             </tr>
                         </tbody>
                     </table>
@@ -498,35 +498,6 @@
                     </thead>
                     <tbody>
                     
-                        <tr>
-                            <td class="popout" onclick="show_result('R36')">tests/TESTS_2024/interpret-only/basic_tests//valid/stack_test</td>
-                            
-                            <td class="RC">53</td>
-                            <td>Wrong RC
-                                <div id="R36" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//valid/stack_test</div>
-                                            <div class="right" onclick="hide('R36')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24" name="Stack test"&gt;<br>    &lt;instruction order="1" opcode="PUSHS"&gt;<br>        &lt;arg1 type="string"&gt;sv&#283;te&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="2" opcode="PUSHS"&gt;<br>        &lt;arg1 type="int"&gt;32&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="3" opcode="PUSHs"&gt;<br>        &lt;arg1 type="string"&gt;ahoj&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="4" opcode="DEFVAR"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="5" opcode="DEFVAR"&gt;<br>        &lt;arg1 type="var"&gt;GF@space&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="6" opcode="PopS"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="7" opcode="Write"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="8" opcode="POPS"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="9" opcode="INT2CHAR"&gt;<br>        &lt;arg1 type="var"&gt;GF@space&lt;/arg1&gt;<br>        &lt;arg2 type="var"&gt;GF@val&lt;/arg2&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="10" opcode="WRITE"&gt;<br>        &lt;arg1 type="var"&gt;GF@space&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="11" opcode="POPS"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="12" opcode="WRITE"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                0</div>
-                                                <div class="tex out">
-                                                53</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -713,6 +684,11 @@
                         </tr>
                         <tr>
                             <td>tests/TESTS_2024/interpret-only/basic_tests//valid/read</td>
+                            <td class="RC">0</td>
+                            <td>Passed</td>
+                        </tr>
+                        <tr>
+                            <td>tests/TESTS_2024/interpret-only/basic_tests//valid/stack_test</td>
                             <td class="RC">0</td>
                             <td>Passed</td>
                         </tr>
@@ -1092,35 +1068,11 @@
                             <td class="RC">0</td>
                             <td>Passed</td>
                         </tr>
-                        <tr class="valid fail">
-<td class="test"></td>
-                            <td class="popout" onclick="show_result('R36T')">&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;stack_test</td>
-                            
-                            <td class="RC">53</td>
-                            <td>Wrong RC
-                                <div id="R36T" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//valid/stack_test</div>
-                                            <div class="right" onclick="hide('R36T')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24" name="Stack test"&gt;<br>    &lt;instruction order="1" opcode="PUSHS"&gt;<br>        &lt;arg1 type="string"&gt;sv&#283;te&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="2" opcode="PUSHS"&gt;<br>        &lt;arg1 type="int"&gt;32&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="3" opcode="PUSHs"&gt;<br>        &lt;arg1 type="string"&gt;ahoj&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="4" opcode="DEFVAR"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="5" opcode="DEFVAR"&gt;<br>        &lt;arg1 type="var"&gt;GF@space&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="6" opcode="PopS"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="7" opcode="Write"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="8" opcode="POPS"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="9" opcode="INT2CHAR"&gt;<br>        &lt;arg1 type="var"&gt;GF@space&lt;/arg1&gt;<br>        &lt;arg2 type="var"&gt;GF@val&lt;/arg2&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="10" opcode="WRITE"&gt;<br>        &lt;arg1 type="var"&gt;GF@space&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="11" opcode="POPS"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="12" opcode="WRITE"&gt;<br>        &lt;arg1 type="var"&gt;GF@val&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                0</div>
-                                                <div class="tex out">
-                                                53</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
+                        <tr class="valid pass">
+<td></td>
+                            <td>&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;stack_test</td>
+                            <td class="RC">0</td>
+                            <td>Passed</td>
                         </tr>
                         <tr class="valid pass">
 <td></td>

@@ -275,13 +275,12 @@ class ProgramFlow
 
 
     // STACK
-    public static function pushToDataStack($value): void
+    public static function pushToDataStack(array $data): void
     {
-        array_push(self::$dataStack, $value);
-        print_r(self::$dataStack);
+        array_push(self::$dataStack, $data);
     }
 
-    public static function popFromDataStack()
+    public static function popFromDataStack() : ?array
     {
         return array_pop(self::$dataStack);
     }

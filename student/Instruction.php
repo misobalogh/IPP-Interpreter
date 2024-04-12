@@ -156,10 +156,12 @@ class InstructionPushs extends Instruction
             throw new XMLStructureException("Missing argument");
         }
 
-        $value = $this->arg1->getValue();
-        $type = $this->arg1->getType();
+        $data = [
+            "value" => $this->arg1->getValue(),
+            "type" => $this->arg1->getType()
+        ];
 
-        ProgramFlow::pushToDataStack($value, $type);
+        ProgramFlow::pushToDataStack($data);
 
         return 0;
     }
@@ -179,10 +181,13 @@ class InstructionPops extends Instruction
             throw new ValueException("Cannot pop from empty data stack");
         }
 
-        $frame = $this->arg1->frame;
         $valueSet = $this->arg1->value;
+        $frameSet = $this->arg1->frame;
+        $type = $value["type"];
+        $value = $value["value"];
+        
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, $type, $value);
 
-        ProgramFlow::getFrame($frame)->setData($valueSet, $value['type'], $value['value']);
 
         return 0;
     }
