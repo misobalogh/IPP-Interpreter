@@ -32,7 +32,6 @@ abstract class Instruction
     {
         foreach ([$this->arg1, $this->arg2, $this->arg3] as $arg) {
             if ($arg !== null && !$arg->isDefined() && $arg->type === DataType::VAR) {
-                echo $arg->value."\n";
                 throw new UndefinedVariableException("Undefined variable");
             }
         }
@@ -53,12 +52,13 @@ class InstructionMove extends Instruction
         }
 
         $valueGet = $this->arg2->getValue();
-        $typeGet = $this->arg2->type;
+        $typeGet = $this->arg2->getType();
         
         $valueSet = $this->arg1->value;
         $frameSet = $this->arg1->frame;
-        
+
         ProgramFlow::GetFrame($frameSet)->setData($valueSet, $typeGet, $valueGet);
+
         return 0;
     }
 }
@@ -150,6 +150,17 @@ class InstructionReturn extends Instruction
 class InstructionPushs extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+
+        if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
+
+        $value = $this->arg1->getValue();
+        $type = $this->arg1->getType();
+
+        ProgramFlow::pushToDataStack($value, $type);
+
         return 0;
     }
 }
@@ -157,6 +168,22 @@ class InstructionPushs extends Instruction
 class InstructionPops extends Instruction
 {
     public function execute(): int{
+        $this->checkArgs();
+
+        if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
+            throw new XMLStructureException("Missing argument");
+        }
+
+        $value = ProgramFlow::popFromDataStack();
+        if ($value === null) {
+            throw new ValueException("Cannot pop from empty data stack");
+        }
+
+        $frame = $this->arg1->frame;
+        $valueSet = $this->arg1->value;
+
+        ProgramFlow::getFrame($frame)->setData($valueSet, $value['type'], $value['value']);
+
         return 0;
     }
 }
@@ -480,7 +507,7 @@ class InstructionStri2Int extends Instruction
             throw new StringOperationException("Index out of range");
         }
 
-        $converted = mb_ord($symbol1_value);
+        $converted = mb_ord($symbol1_value[$symbol2_value]);
         if ($converted === false) {
             throw new StringOperationException("Error during conversion");
         }
@@ -517,25 +544,26 @@ class InstructionRead extends Instruction
         }
 
         $type = $this->arg2->getValue();
+
         $valueSet = $this->arg1->value;
         $frameSet = $this->arg1->frame;
 
-        if (strtoupper($type) === DataType::INT) {
+        if (strcasecmp($type, DataType::INT) === 0) {
             $input = $this->stdin->readInt();
         }
 
-        else if (strtoupper($type) === DataType::BOOL) {
+        else if (strcasecmp($type, DataType::BOOL) === 0) {
             $input = $this->stdin->readBool();
         }
 
-        else if (strtoupper($type) === DataType::STRING) {
+        else if (strcasecmp($type, DataType::STRING) === 0){
             $input = $this->stdin->readString();
         }
         else {
-            $input = false;
+            $input = null;
         }
 
-        if ($input === false) {
+        if ($input === null) {
             ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::NIL, 'nil');
             return 0;
         }
@@ -575,7 +603,6 @@ class InstructionWrite extends Instruction
         }
 
         else if ($type === DataType::STRING) {
-            // $this->stdout->writeString(stripcslashes($value));
             $this->stdout->writeString(preg_replace_callback('/\\\\([0-9]{3})/', 
                 function ($matches) {
                     return chr((int)$matches[1]);
@@ -698,19 +725,23 @@ class InstructionSetChar extends Instruction
 
         $symbol1_value = $this->arg2->getValue();
         $symbol2_value = $this->arg3->getValue();
+        if (strlen($symbol2_value) > 1) {
+            $symbol2_value = symbol2_value[0];
+        }
 
         $valueSet = $this->arg1->value;
         $frameSet = $this->arg1->frame;
+        $stringToModify = $this->arg1->getValue();
 
         $symbol1_value = (int)$symbol1_value;
         $symbol2_value = (string)$symbol2_value;
-        if ($symbol1_value < 0 || $symbol1_value >= strlen($symbol2_value)) {
+        if ($symbol1_value < 0 || $symbol1_value >= strlen($stringToModify)) {
             throw new StringOperationException("Index out of range");
         } 
 
-        $symbol2_value[$symbol1_value] = $symbol2_value;
+        $stringToModify[$symbol1_value] = $symbol2_value;
 
-        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::STRING, $symbol2_value);
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::STRING, $stringToModify);
 
         return 0;
     }

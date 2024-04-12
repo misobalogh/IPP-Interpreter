@@ -264,13 +264,13 @@
 
             @keyframes left{  
                 100%{
-                    transform: rotate(162deg);
+                    transform: rotate(176deg);
                     
                 }
             }
             @keyframes right{
                 100%{
-                    transform: rotate(162deg);
+                    transform: rotate(176deg);
                 }
             }
             @keyframes colors{
@@ -448,7 +448,7 @@
                 <div id="percent">
                     <div class="circular">
                         <div class="inner"></div>
-                        <div id="num" class="number">90%</div>
+                        <div id="num" class="number">98%</div>
                         <div class="circle">
                             <div class="bar left">
                                 <div class="progress"></div>
@@ -470,13 +470,13 @@
                                 <td class="text_right">
                                     Tests Passed:
                                 </td>
-                                <td id="pass">48</td>
+                                <td id="pass">52</td>
                             </tr>
                             <tr>
                                 <td class="text_right">
                                     Tests Failed:
                                 </td>
-                                <td id="fail">5</td>
+                                <td id="fail">1</td>
                             </tr>
                         </tbody>
                     </table>
@@ -499,128 +499,9 @@
                     <tbody>
                     
                         <tr>
-                            <td class="popout" onclick="show_result('R19')">tests/TESTS_2024/interpret-only/basic_tests//frames/TFafterPush</td>
-                            
-                            <td class="RC">255</td>
-                            <td>Wrong RC
-                                <div id="R19" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//frames/TFafterPush</div>
-                                            <div class="right" onclick="hide('R19')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24"&gt;<br>	&lt;instruction order="1" opcode="CREATEFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="2" opcode="DEFVAR"&gt;<br>  		&lt;arg1 type="var"&gt;TF@counter&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="3" opcode="PUSHFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="7" opcode="WRITE"&gt;<br> 		&lt;arg1 type="var"&gt;TF@counter&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                55</div>
-                                                <div class="tex out">
-                                                255</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="popout" onclick="show_result('R20')">tests/TESTS_2024/interpret-only/basic_tests//frames/defvarnoTF</td>
-                            
-                            <td class="RC">255</td>
-                            <td>Wrong RC
-                                <div id="R20" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//frames/defvarnoTF</div>
-                                            <div class="right" onclick="hide('R20')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24"&gt;<br>	&lt;instruction order="1" opcode="DEFVAR"&gt;<br>		&lt;arg1 type="var"&gt;TF@counter&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                55</div>
-                                                <div class="tex out">
-                                                255</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="popout" onclick="show_result('R23')">tests/TESTS_2024/interpret-only/basic_tests//frames/secondLF</td>
-                            
-                            <td class="RC">255</td>
-                            <td>Wrong RC
-                                <div id="R23" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//frames/secondLF</div>
-                                            <div class="right" onclick="hide('R23')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24"&gt;<br>	&lt;instruction order="1" opcode="CREATEFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="2" opcode="DEFVAR"&gt;<br>  		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="3" opcode="MOVE"&gt;<br>		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br>		&lt;arg2 type="int"&gt;5&lt;/arg2&gt;<br>	&lt;/instruction&gt;<br>	&lt;instruction order="4" opcode="PUSHFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="5" opcode="WRITE"&gt;<br>  		&lt;arg1 type="var"&gt;LF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="10" opcode="CREATEFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="11" opcode="DEFVAR"&gt;<br>  		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="12" opcode="MOVE"&gt;<br>		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br>		&lt;arg2 type="int"&gt;10&lt;/arg2&gt;<br>	&lt;/instruction&gt;<br>	&lt;instruction order="13" opcode="PUSHFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="14" opcode="WRITE"&gt;<br>  		&lt;arg1 type="var"&gt;LF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="20" opcode="POPFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="21" opcode="WRITE"&gt;<br>  		&lt;arg1 type="var"&gt;LF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="22" opcode="WRITE"&gt;<br>  		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                0
-</div>
-                                                <div class="tex out">
-                                                255</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="popout" onclick="show_result('R32')">tests/TESTS_2024/interpret-only/basic_tests//valid/label_call_return</td>
-                            
-                            <td class="RC">0</td>
-                            <td>Output diference error
-                                <div id="R32" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//valid/label_call_return</div>
-                                            <div class="right" onclick="hide('R32')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24"&gt;<br>    &lt;instruction order="1" opcode="JUMP"&gt;<br>        &lt;arg1 type="label"&gt;fooend&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="2" opcode="LABEL"&gt;<br>        &lt;arg1 type="label"&gt;foo&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="3" opcode="WRITE"&gt;<br>        &lt;arg1 type="string"&gt;Oh,yeah,motherfucker!&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="5" opcode="RETURN"/&gt;<br>    &lt;instruction order="6" opcode="LABEL"&gt;<br>        &lt;arg1 type="label"&gt;fooend&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="7" opcode="CALL"&gt;<br>        &lt;arg1 type="label"&gt;foo&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                    Oh,yeah,motherfucker!<br>
-                                                </div>
-                                                <div class="tex out">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
                             <td class="popout" onclick="show_result('R36')">tests/TESTS_2024/interpret-only/basic_tests//valid/stack_test</td>
                             
-                            <td class="RC">32</td>
+                            <td class="RC">53</td>
                             <td>Wrong RC
                                 <div id="R36" class="popup">
                                     <div class="pop_content">
@@ -639,7 +520,7 @@
                                                 <div class="tex ref_out">
                                                 0</div>
                                                 <div class="tex out">
-                                                32</div>
+                                                53</div>
                                             </div>
                                         </div>
                                     </div>
@@ -751,6 +632,16 @@
                             <td>Passed</td>
                         </tr>
                         <tr>
+                            <td>tests/TESTS_2024/interpret-only/basic_tests//frames/TFafterPush</td>
+                            <td class="RC">55</td>
+                            <td>Passed</td>
+                        </tr>
+                        <tr>
+                            <td>tests/TESTS_2024/interpret-only/basic_tests//frames/defvarnoTF</td>
+                            <td class="RC">55</td>
+                            <td>Passed</td>
+                        </tr>
+                        <tr>
                             <td>tests/TESTS_2024/interpret-only/basic_tests//frames/popEmpty</td>
                             <td class="RC">55</td>
                             <td>Passed</td>
@@ -758,6 +649,11 @@
                         <tr>
                             <td>tests/TESTS_2024/interpret-only/basic_tests//frames/pushEmpty</td>
                             <td class="RC">55</td>
+                            <td>Passed</td>
+                        </tr>
+                        <tr>
+                            <td>tests/TESTS_2024/interpret-only/basic_tests//frames/secondLF</td>
+                            <td class="RC">0</td>
                             <td>Passed</td>
                         </tr>
                         <tr>
@@ -798,6 +694,11 @@
                         <tr>
                             <td>tests/TESTS_2024/interpret-only/basic_tests//valid/exit</td>
                             <td class="RC">9</td>
+                            <td>Passed</td>
+                        </tr>
+                        <tr>
+                            <td>tests/TESTS_2024/interpret-only/basic_tests//valid/label_call_return</td>
+                            <td class="RC">0</td>
                             <td>Passed</td>
                         </tr>
                         <tr>
@@ -1071,65 +972,17 @@
                             <td class="RC"></td>
                             <td></td>
                         </tr>
-                        <tr class="frames fail">
-<td class="test"></td>
-                            <td class="popout" onclick="show_result('R19T')">&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;TFafterPush</td>
-                            
-                            <td class="RC">255</td>
-                            <td>Wrong RC
-                                <div id="R19T" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//frames/TFafterPush</div>
-                                            <div class="right" onclick="hide('R19T')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24"&gt;<br>	&lt;instruction order="1" opcode="CREATEFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="2" opcode="DEFVAR"&gt;<br>  		&lt;arg1 type="var"&gt;TF@counter&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="3" opcode="PUSHFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="7" opcode="WRITE"&gt;<br> 		&lt;arg1 type="var"&gt;TF@counter&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                55</div>
-                                                <div class="tex out">
-                                                255</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
+                        <tr class="frames pass">
+<td></td>
+                            <td>&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;TFafterPush</td>
+                            <td class="RC">55</td>
+                            <td>Passed</td>
                         </tr>
-                        <tr class="frames fail">
-<td class="test"></td>
-                            <td class="popout" onclick="show_result('R20T')">&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;defvarnoTF</td>
-                            
-                            <td class="RC">255</td>
-                            <td>Wrong RC
-                                <div id="R20T" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//frames/defvarnoTF</div>
-                                            <div class="right" onclick="hide('R20T')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24"&gt;<br>	&lt;instruction order="1" opcode="DEFVAR"&gt;<br>		&lt;arg1 type="var"&gt;TF@counter&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                55</div>
-                                                <div class="tex out">
-                                                255</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
+                        <tr class="frames pass">
+<td></td>
+                            <td>&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;defvarnoTF</td>
+                            <td class="RC">55</td>
+                            <td>Passed</td>
                         </tr>
                         <tr class="frames pass">
 <td></td>
@@ -1143,36 +996,11 @@
                             <td class="RC">55</td>
                             <td>Passed</td>
                         </tr>
-                        <tr class="frames fail">
-<td class="test"></td>
-                            <td class="popout" onclick="show_result('R23T')">&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;secondLF</td>
-                            
-                            <td class="RC">255</td>
-                            <td>Wrong RC
-                                <div id="R23T" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//frames/secondLF</div>
-                                            <div class="right" onclick="hide('R23T')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24"&gt;<br>	&lt;instruction order="1" opcode="CREATEFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="2" opcode="DEFVAR"&gt;<br>  		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="3" opcode="MOVE"&gt;<br>		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br>		&lt;arg2 type="int"&gt;5&lt;/arg2&gt;<br>	&lt;/instruction&gt;<br>	&lt;instruction order="4" opcode="PUSHFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="5" opcode="WRITE"&gt;<br>  		&lt;arg1 type="var"&gt;LF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="10" opcode="CREATEFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="11" opcode="DEFVAR"&gt;<br>  		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="12" opcode="MOVE"&gt;<br>		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br>		&lt;arg2 type="int"&gt;10&lt;/arg2&gt;<br>	&lt;/instruction&gt;<br>	&lt;instruction order="13" opcode="PUSHFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="14" opcode="WRITE"&gt;<br>  		&lt;arg1 type="var"&gt;LF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="20" opcode="POPFRAME"&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="21" opcode="WRITE"&gt;<br>  		&lt;arg1 type="var"&gt;LF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>	&lt;instruction order="22" opcode="WRITE"&gt;<br>  		&lt;arg1 type="var"&gt;TF@var&lt;/arg1&gt;<br> 	&lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                0
-</div>
-                                                <div class="tex out">
-                                                255</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
+                        <tr class="frames pass">
+<td></td>
+                            <td>&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;secondLF</td>
+                            <td class="RC">0</td>
+                            <td>Passed</td>
                         </tr>
                     <tr id="jumps" class="">
                             <td onclick="drop_toggle(this,'jumps')" class="open">/\</td>
@@ -1234,37 +1062,11 @@
                             <td class="RC">9</td>
                             <td>Passed</td>
                         </tr>
-                        <tr class="valid fail">
-<td class="test"></td>
-                            <td class="popout" onclick="show_result('R32T')">&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;label_call_return</td>
-                            
+                        <tr class="valid pass">
+<td></td>
+                            <td>&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;label_call_return</td>
                             <td class="RC">0</td>
-                            <td>Output diference error
-                                <div id="R32T" class="popup">
-                                    <div class="pop_content">
-                                        <div class="pop_menu">
-                                            <div class="left">tests/TESTS_2024/interpret-only/basic_tests//valid/label_call_return</div>
-                                            <div class="right" onclick="hide('R32T')">X</div>
-                                        </div>
-                                        <div class="pop_text">
-                                            <div class="text_devider">   
-                                                <div class="GH">Source file</div>
-                                                <div class="GH">Correct output</div>
-                                                <div class="GH">Your output</div>
-                                                <div class="tex src">
-                                                    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;program language="IPPcode24"&gt;<br>    &lt;instruction order="1" opcode="JUMP"&gt;<br>        &lt;arg1 type="label"&gt;fooend&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="2" opcode="LABEL"&gt;<br>        &lt;arg1 type="label"&gt;foo&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="3" opcode="WRITE"&gt;<br>        &lt;arg1 type="string"&gt;Oh,yeah,motherfucker!&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="5" opcode="RETURN"/&gt;<br>    &lt;instruction order="6" opcode="LABEL"&gt;<br>        &lt;arg1 type="label"&gt;fooend&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>    &lt;instruction order="7" opcode="CALL"&gt;<br>        &lt;arg1 type="label"&gt;foo&lt;/arg1&gt;<br>    &lt;/instruction&gt;<br>&lt;/program&gt;<br>
-                                                </div>
-                                                <div class="tex ref_out">
-                                                    Oh,yeah,motherfucker!<br>
-                                                </div>
-                                                <div class="tex out">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
+                            <td>Passed</td>
                         </tr>
                     <tr id="order" class="valid">
                             <td onclick="drop_toggle(this,'order')" class="open">/\</td>
@@ -1294,7 +1096,7 @@
 <td class="test"></td>
                             <td class="popout" onclick="show_result('R36T')">&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8239;&nbsp;&#8866;stack_test</td>
                             
-                            <td class="RC">32</td>
+                            <td class="RC">53</td>
                             <td>Wrong RC
                                 <div id="R36T" class="popup">
                                     <div class="pop_content">
@@ -1313,7 +1115,7 @@
                                                 <div class="tex ref_out">
                                                 0</div>
                                                 <div class="tex out">
-                                                32</div>
+                                                53</div>
                                             </div>
                                         </div>
                                     </div>

@@ -28,6 +28,9 @@ class ProgramFlow
     private static Frame $globalFrame;
     private static ?Frame $temporaryFrame;
 
+
+    private static array $dataStack;
+
     public static int $executedInstructionCount = 0;
 
     /**
@@ -41,9 +44,8 @@ class ProgramFlow
         self::$frames = [];
         self::$callStack = [];
         self::$temporaryFrame = null;
-        // global frame
         self::$globalFrame = new Frame();
-        // self::pushFrame(self::$globalFrame);
+        self::$dataStack = [];
     }
 
     // IP
@@ -121,10 +123,13 @@ class ProgramFlow
     
     // FRAMES
     public static function getFrame(string $frameType): ?Frame{
-        if ($frameType == FrameType::GLOBAL) {
+        if ($frameType === FrameType::GLOBAL) {
             return self::$globalFrame;
         }
-        else if ($frameType == FrameType::TEMPORARY) {
+        else if ($frameType === FrameType::TEMPORARY) {
+            if (self::$temporaryFrame === null) {
+                throw new FrameAccessException("No temporary frame");
+            }
             return self::$temporaryFrame;
         }
         else {
@@ -233,6 +238,9 @@ class ProgramFlow
      */
     public static function addToTemporaryFrame(string $key, ?string $type, $value): void
     {
+        if (self::$temporaryFrame === null) {
+            throw new FrameAccessException("No temporary frame");
+        }
         if (self::$temporaryFrame->keyExists($key)) {
             throw new SemanticErrorException("Rededfinition of variable $key");
         }
@@ -263,5 +271,18 @@ class ProgramFlow
     public static function exit(int $value): void
     {
         exit($value);
+    }
+
+
+    // STACK
+    public static function pushToDataStack($value): void
+    {
+        array_push(self::$dataStack, $value);
+        print_r(self::$dataStack);
+    }
+
+    public static function popFromDataStack()
+    {
+        return array_pop(self::$dataStack);
     }
 }

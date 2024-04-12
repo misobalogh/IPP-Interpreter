@@ -4,6 +4,8 @@ namespace IPP\Student;
 
 use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\XMLStructureException;
+use IPP\Student\Exception\OperandValueException;
+use IPP\Student\Exception\FrameAccessException;
 
 class InstructionData
 {
@@ -53,7 +55,7 @@ class InstructionData
                     throw new XMLStructureException("Invalid argument type");
                 }
                 $argName = trim($arg->nodeValue);
-                if ($argName !== '') {
+                if ($argName !== '' || $type === DataType::STRING) {
                     if ($type === DataType::VAR) {
                         list($frame, $value) = array_map('trim', explode('@', $argName));
                         if (!in_array($frame, ['GF', 'LF', 'TF'])) {
@@ -144,7 +146,7 @@ class InstructionArgument
     {   
         if ($this->isVar())
         {   
-            return ProgramFlow::getFrame($this->frame)->keyExists($this->value) || ProgramFlow::getGlobalFrame()->keyExists($this->value);
+            return ProgramFlow::getFrame($this->frame)?->keyExists($this->value) || ProgramFlow::getGlobalFrame()->keyExists($this->value);
         }
         else if ($this->isLabel())
         {
