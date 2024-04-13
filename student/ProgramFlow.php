@@ -49,7 +49,7 @@ class ProgramFlow
      */
     private static array $dataStack;
 
-    public static int $executedInstructionCount = 0;
+    private static int $executedInstructionCount = 0;
 
     /**
      * @param InstructionData[] $instructionList

@@ -47,7 +47,7 @@ abstract class Instruction
      * 
      * Check if all arguments are defined in the frame
      */
-    final public function checkArgs() : void
+    protected final function checkArgs() : void
     {
         foreach ([$this->arg1, $this->arg2, $this->arg3] as $arg) {
             if ($arg !== null && !$arg->isDefined() && $arg->type === DataType::VAR) {
