@@ -1,4 +1,9 @@
 <?php
+/*
+Michal Balogh, xbalog06
+IPP - project 2
+VUT FIT 2024
+*/
 
 namespace IPP\Student;
 
@@ -8,6 +13,12 @@ use IPP\Core\Interface\OutputWriter;
 
 require_once "Instruction.php";
 
+
+/**
+ * Class InstructionFactory
+ *
+ * Factory for creating instructions
+ */
 class InstructionFactory
 {
     private InputReader $stdin;
@@ -24,6 +35,8 @@ class InstructionFactory
 
     /**
      * @throws XMLStructureException
+     * 
+     * Create instruction based on opcode
      */
     public function createInstruction(InstructionData $instructionData): Instruction{
         $opcode = $instructionData->opcode;

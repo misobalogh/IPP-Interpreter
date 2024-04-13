@@ -1,4 +1,10 @@
 <?php
+/*
+Michal Balogh, xbalog06
+IPP - project 2
+VUT FIT 2024
+*/
+
 
 namespace IPP\Student;
 
@@ -6,6 +12,7 @@ use IPP\Core\Interface\InputReader;
 use IPP\Core\Interface\OutputWriter;
 use IPP\Student\Exception\FrameAccessException;
 use IPP\Student\Exception\OperandValueException;
+use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\StringOperationException;
 use IPP\Student\Exception\UndefinedVariableException;
 use IPP\Student\Exception\ValueException;
@@ -15,12 +22,19 @@ use IPP\Student\Types\DataType;
 
 #=========== Abstract class for instructions ===========
 
+
+/**
+ * Abstract class for instructions
+ */
 abstract class Instruction
 {
     protected ?InstructionArgument $arg1;
     protected ?InstructionArgument $arg2;
     protected ?InstructionArgument $arg3;
 
+    /**
+     * @param InstructionData $instructionData
+     */
     public function __construct(InstructionData $instructionData)
     {
         $this->arg1 = $instructionData->arg1;
@@ -30,6 +44,8 @@ abstract class Instruction
 
     /**
      * @throws UndefinedVariableException
+     * 
+     * Check if all arguments are defined in the frame
      */
     final public function checkArgs() : void
     {
@@ -40,7 +56,10 @@ abstract class Instruction
         }
     }
 
-    abstract public function execute(): int;
+    /**
+     * Execute instruction
+     */
+    abstract public function execute(): void;
 }
 
 
@@ -53,7 +72,8 @@ class InstructionMove extends Instruction
      * @throws XMLStructureException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 == null || $this->arg2 == null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -67,18 +87,17 @@ class InstructionMove extends Instruction
 
         ProgramFlow::GetFrame($frameSet)->setData($valueSet, $typeGet, $valueGet);
 
-        return 0;
     }
 }
 
+
 class InstructionCreateFrame extends Instruction
 {
-    public function execute(): int{
+    public function execute(): void
+    {
         ProgramFlow::deleteTemporaryFrame();
         $frame = new Frame();
         ProgramFlow::setTemporaryFrame($frame);
-
-        return 0;
     }
 }
 
@@ -87,7 +106,8 @@ class InstructionPushFrame extends Instruction
     /**
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $temporaryFrame = ProgramFlow::getTemporaryFrame();
         if ($temporaryFrame === null) {
             throw new FrameAccessException("Cannot push frame from empty stack");
@@ -96,7 +116,6 @@ class InstructionPushFrame extends Instruction
         ProgramFlow::pushFrame($temporaryFrame);
         ProgramFlow::deleteTemporaryFrame();
 
-        return 0;
     }
 }
 
@@ -105,39 +124,45 @@ class InstructionPopFrame extends Instruction
     /**
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $frame = ProgramFlow::popFrame();
         if ($frame === null) {
             throw new FrameAccessException("Cannot pop frame from empty stack");
         }
 
-        ProgramFlow::setTemporaryFrame($frame);        
+        ProgramFlow::setTemporaryFrame($frame);
 
-        return 0;
     }
 }
 
 class InstructionDefVar extends Instruction
 {
     /**
+     * @return void
+     * @throws FrameAccessException
+     * @throws SemanticErrorException
      * @throws XMLStructureException
      */
-    public function execute(): int {
+    public function execute(): void
+    {
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
         }
-        ProgramFlow::addToFrame($this->arg1->frame, $this->arg1->value, null, null);     
-        return 0;
+        ProgramFlow::addToFrame($this->arg1->frame, $this->arg1->value, null, null);
     }
 }
 
 class InstructionCall extends Instruction
 {
     /**
+     * @return void
+     * @throws SemanticErrorException
      * @throws UndefinedVariableException
      * @throws XMLStructureException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -146,7 +171,6 @@ class InstructionCall extends Instruction
         ProgramFlow::pushToCallStack(ProgramFlow::getPointer());
         ProgramFlow::jumpTo($this->arg1->value);
 
-        return 0;
     }
 }
 
@@ -155,7 +179,8 @@ class InstructionReturn extends Instruction
     /**
      * @throws ValueException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $pointer = ProgramFlow::popFromCallStack();
         if ($pointer === null) {
             throw new ValueException("Cannot return from empty call stack");
@@ -163,7 +188,6 @@ class InstructionReturn extends Instruction
 
         ProgramFlow::setPointer($pointer);
 
-        return 0;
     }
 }
 
@@ -177,7 +201,8 @@ class InstructionPushs extends Instruction
      * @throws UndefinedVariableException
      * @throws XMLStructureException|FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
 
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
@@ -191,7 +216,6 @@ class InstructionPushs extends Instruction
 
         ProgramFlow::pushToDataStack($data);
 
-        return 0;
     }
 }
 
@@ -203,7 +227,8 @@ class InstructionPops extends Instruction
      * @throws ValueException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
 
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
@@ -223,7 +248,6 @@ class InstructionPops extends Instruction
         ProgramFlow::getFrame($frameSet)->setData($valueSet, $type, $value);
 
 
-        return 0;
     }
 }
 
@@ -239,7 +263,8 @@ class InstructionAdd extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -259,7 +284,6 @@ class InstructionAdd extends Instruction
         $frameSet = $this->arg1->frame;
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $symbol1_value + $symbol2_value);
-        return 0;
     }
 }
 
@@ -271,7 +295,8 @@ class InstructionSub extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -292,7 +317,6 @@ class InstructionSub extends Instruction
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $symbol1_value - $symbol2_value);
 
-        return 0;
     }
 }
 
@@ -304,7 +328,8 @@ class InstructionMul extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -325,7 +350,6 @@ class InstructionMul extends Instruction
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $symbol1_value * $symbol2_value);
 
-        return 0;
     }
 }
 
@@ -338,7 +362,8 @@ class InstructionIDiv extends Instruction
      * @throws FrameAccessException
      * @throws OperandValueException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -362,8 +387,7 @@ class InstructionIDiv extends Instruction
         $frameSet = $this->arg1->frame;
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, intdiv($symbol1_value, $symbol2_value));
-        
-        return 0;
+
     }
 }
 
@@ -375,7 +399,8 @@ class InstructionLt extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -397,7 +422,6 @@ class InstructionLt extends Instruction
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() < $this->arg3->getValue());
 
-        return 0;
     }
 }
 
@@ -409,7 +433,8 @@ class InstructionGt extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -431,7 +456,6 @@ class InstructionGt extends Instruction
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() > $this->arg3->getValue());
 
-        return 0;
     }
 }
 
@@ -443,7 +467,8 @@ class InstructionEq extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -460,7 +485,6 @@ class InstructionEq extends Instruction
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() === $this->arg3->getValue());
 
-        return 0;
     }
 }
 
@@ -472,7 +496,8 @@ class InstructionAnd extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -490,7 +515,6 @@ class InstructionAnd extends Instruction
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() && $this->arg3->getValue());
 
-        return 0;
     }
 }
 
@@ -502,7 +526,8 @@ class InstructionOr extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -520,7 +545,6 @@ class InstructionOr extends Instruction
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, $this->arg2->getValue() || $this->arg3->getValue());
 
-        return 0;
     }
 }   
 
@@ -532,7 +556,8 @@ class InstructionNot extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -549,7 +574,6 @@ class InstructionNot extends Instruction
         
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::BOOL, !$this->arg2->getValue());
 
-        return 0;
     }
 }
 
@@ -562,7 +586,8 @@ class InstructionInt2Char extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -583,8 +608,7 @@ class InstructionInt2Char extends Instruction
         $frameSet = $this->arg1->frame;
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::STRING, $converted);
-    
-        return 0;
+
     }
 }
 
@@ -597,7 +621,8 @@ class InstructionStri2Int extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
 
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -631,7 +656,6 @@ class InstructionStri2Int extends Instruction
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, $converted);
 
-        return 0;
     }
 }
 
@@ -651,7 +675,7 @@ class InstructionRead extends Instruction
      * @throws XMLStructureException
      * @throws FrameAccessException
      */
-    public function execute(): int
+    public function execute(): void
     {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
@@ -678,11 +702,10 @@ class InstructionRead extends Instruction
 
         if ($input === null) {
             ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::NIL, 'nil');
-            return 0;
         }
-
-        ProgramFlow::getFrame($frameSet)->setData($valueSet, $type, $input);
-        return 0;
+        else {
+            ProgramFlow::getFrame($frameSet)->setData($valueSet, $type, $input);
+        }
     }
 }
 
@@ -698,7 +721,8 @@ class InstructionWrite extends Instruction
      * @throws UndefinedVariableException
      * @throws XMLStructureException|FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();       
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -730,8 +754,6 @@ class InstructionWrite extends Instruction
         else if ($type === DataType::TYPE) {
             $this->stdout->writeString($value);
         }
-
-        return 0;
     }
 }
 
@@ -747,7 +769,8 @@ class InstructionConcat extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -767,8 +790,7 @@ class InstructionConcat extends Instruction
         $frameSet = $this->arg1->frame;
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::STRING, $symbol1_value . $symbol2_value);
-        
-        return 0;
+
     }
 }
 
@@ -780,7 +802,8 @@ class InstructionStrlen extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -796,8 +819,7 @@ class InstructionStrlen extends Instruction
         $frameSet = $this->arg1->frame;
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, strlen($symbol1_value));
-        
-        return 0;
+
     }
 }
 
@@ -810,7 +832,8 @@ class InstructionGetChar extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -837,7 +860,6 @@ class InstructionGetChar extends Instruction
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::STRING, $symbol1_value[$symbol2_value]);
 
-        return 0;
     }
 }
 
@@ -850,7 +872,8 @@ class InstructionSetChar extends Instruction
      * @throws WrongOperandTypeException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -886,7 +909,6 @@ class InstructionSetChar extends Instruction
 
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::STRING, $stringToModify);
 
-        return 0;
     }
 }
 
@@ -902,7 +924,8 @@ class InstructionType extends Instruction
      * @throws XMLStructureException
      * @throws FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -919,7 +942,6 @@ class InstructionType extends Instruction
         ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::TYPE, $type);
 
 
-        return 0;
     }
 }
 
@@ -929,35 +951,41 @@ class InstructionType extends Instruction
 
 class InstructionLabel extends Instruction
 {
-    public function execute(): int{
-        return 0;
+    public function execute(): void
+    {
     }
 }
 
 class InstructionJump extends Instruction
 {
     /**
+     * @return void
+     * @throws SemanticErrorException
      * @throws UndefinedVariableException
      * @throws XMLStructureException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
         }
         ProgramFlow::jumpTo($this->arg1->value);
-        return 0;
     }
 }
 
 class InstructionJumpIfEQ extends Instruction
 {
     /**
+     * @return void
+     * @throws FrameAccessException
+     * @throws SemanticErrorException
      * @throws UndefinedVariableException
+     * @throws WrongOperandTypeException
      * @throws XMLStructureException
-     * @throws WrongOperandTypeException|FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -977,19 +1005,22 @@ class InstructionJumpIfEQ extends Instruction
         if ($symbol1_value === $symbol2_value) {
             ProgramFlow::jumpTo($label);
         }
-        
-        return 0;
+
     }
 }
 
 class InstructionJumpIfNEQ extends Instruction
 {
     /**
+     * @return void
+     * @throws SemanticErrorException
+     * @throws FrameAccessException
      * @throws UndefinedVariableException
+     * @throws WrongOperandTypeException
      * @throws XMLStructureException
-     * @throws WrongOperandTypeException|FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
             throw new XMLStructureException("Missing argument");
@@ -1009,7 +1040,6 @@ class InstructionJumpIfNEQ extends Instruction
         if ($symbol1_value !== $symbol2_value) {
             ProgramFlow::jumpTo($label);
         }
-        return 0;
     }
 }
 
@@ -1021,7 +1051,8 @@ class InstructionExit extends Instruction
      * @throws WrongOperandTypeException
      * @throws OperandValueException|FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -1037,7 +1068,6 @@ class InstructionExit extends Instruction
 
         ProgramFlow::exit($this->arg1->getValue());
 
-        return 0;
     }
 }
 
@@ -1056,7 +1086,8 @@ class InstructionDprint extends Instruction
      * @throws UndefinedVariableException
      * @throws XMLStructureException|FrameAccessException
      */
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -1085,7 +1116,6 @@ class InstructionDprint extends Instruction
                 $value
             ));
         }
-        return 0;
     }
 }
 
@@ -1096,9 +1126,9 @@ class InstructionBreak extends Instruction
         parent::__construct($instructionData);
     }
 
-    public function execute(): int{
+    public function execute(): void
+    {
         $this->stderr->writeString("Break");
         $this->stderr->writeString("Position in program: " . ProgramFlow::getPointer());
-        return 0;
     }
 }

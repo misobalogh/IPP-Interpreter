@@ -1,4 +1,10 @@
 <?php
+/*
+Michal Balogh, xbalog06
+IPP - project 2
+VUT FIT 2024
+*/
+
 
 namespace IPP\Student;
 
@@ -45,18 +51,26 @@ class InstructionData
         $childNodes = $this->instruction->childNodes;
 
         foreach ($childNodes as $arg) {
+            // Check if the node is an element and if it is an argument
             if ($arg->nodeType === XML_ELEMENT_NODE && str_starts_with($arg->nodeName, 'arg') && $arg instanceof DOMElement) {
+                
+                // Check if the argument has the correct type attribute
                 $type = trim($arg->getAttribute('type'));
                 if (!in_array($type, [Types\DataType::INT, Types\DataType::BOOL, Types\DataType::STRING, Types\DataType::NIL, Types\DataType::TYPE, Types\DataType::LABEL, Types\DataType::VAR])) {
                     throw new XMLStructureException("Invalid argument type");
                 }
+                
+                // Check if the argument has a value
                 $argName = trim($arg->nodeValue);
                 if ($argName !== '' || $type === Types\DataType::STRING) {
                     if ($type === Types\DataType::VAR) {
+                        // split the argument into frame and value and assign them to the variables
                         list($frame, $value) = array_map('trim', explode('@', $argName));
+
                         if (!in_array($frame, ['GF', 'LF', 'TF'])) {
                             throw new XMLStructureException("Invalid frame");
                         }
+
                     } else {
                         $frame = null;
                         $value = $argName;
@@ -66,8 +80,7 @@ class InstructionData
                     throw new XMLStructureException("Argument value is empty");
                 }
 
-               
-
+                // Assign the argument to the correct variable and check if it is not already set
                 switch ($arg->nodeName) {
                     case 'arg1':
                         if ($this->arg1 !== null) {

@@ -1,11 +1,25 @@
 <?php
+/*
+Michal Balogh, xbalog06
+IPP - project 2
+VUT FIT 2024
+*/
+
 
 namespace IPP\Student;
 
-use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\FrameAccessException;
+use IPP\Student\Exception\SemanticErrorException;
+use IPP\Student\Types\FrameType;
 
 
+/**
+ * Class ProgramFlow
+ *
+ * Class for controlling the program flow,
+ * including instruction pointer, labels,
+ * frames and data stack
+ */
 class ProgramFlow
 {
     private static int $instructionPointer;
@@ -41,6 +55,9 @@ class ProgramFlow
      * @param InstructionData[] $instructionList
      * @throws SemanticErrorException
      * @throws SemanticErrorException
+     * 
+     * Initialize the program flow with the instruction list, global frame
+     * and find and store all labels
      */
     public static function initialize(array $instructionList): void
     {
@@ -54,7 +71,7 @@ class ProgramFlow
         self::$dataStack = [];
     }
 
-    // IP
+    // IP - methods for controlling the instruction pointer
     public static function getPointer(): int
     {
         return self::$instructionPointer;
@@ -71,6 +88,8 @@ class ProgramFlow
         self::$executedInstructionCount++;
     }
 
+
+    // CALL STACK - methods for working with call stack
     public static function pushToCallStack(int $instructionPointer): void
     {
         self::$callStack[] = $instructionPointer;
@@ -81,10 +100,12 @@ class ProgramFlow
         return array_pop(self::$callStack);
     }
 
-    //  LABELS
+    //  LABELS - methods for working with labels
 
     /**
      * @throws SemanticErrorException
+     * 
+     * Jump to the instruction with the given label
      */
     public static function jumpTo(string $label): void
     {
@@ -93,6 +114,8 @@ class ProgramFlow
 
     /**
      * @throws SemanticErrorException
+     * 
+     * Get the index of the instruction with the given label
      */
     private static function getLabel(string $label): int
     {
@@ -131,10 +154,12 @@ class ProgramFlow
         return $labels;        
     }
     
-    // FRAMES
+    // FRAMES - methods for working with frames
 
     /**
      * @throws FrameAccessException
+     * 
+     * Get the frame based on the frame type
      */
     public static function getFrame(string $frameType): ?Frame{
         if ($frameType === FrameType::GLOBAL) {
@@ -159,6 +184,8 @@ class ProgramFlow
      * @param mixed $value
      * @throws FrameAccessException
      * @throws SemanticErrorException
+     * 
+     * Add variable to the frame based on the frame type
      */
     public static function addToFrame(string $frameType, string $key, ?string $type, mixed $value): void
     {
@@ -183,6 +210,11 @@ class ProgramFlow
         return array_pop(self::$frames);
     }
 
+    /**
+     * @return Frame|null
+     * 
+     * Get the frame from the top of the stack
+     */
     public static function getCurrentFrame(): ?Frame
     {
         $frameToReturn = end(self::$frames);
@@ -285,18 +317,28 @@ class ProgramFlow
         self::$temporaryFrame = null;
     }
 
+    /**
+     * @return bool
+     * 
+     * Check if the program flow can continue
+     */
     public static function continue(): bool
     {
         return self::$instructionPointer < count(self::$instructionList);
     }
 
+    /**
+     * @param int $value
+     * 
+     * Exit the program with the given value
+     */
     public static function exit(int $value): void
     {
         exit($value);
     }
 
 
-    // STACK
+    // STACK - for working with data stack
 
     /**
      * @param array<string, mixed> $data

@@ -1,5 +1,9 @@
 <?php
-
+/*
+Michal Balogh, xbalog06
+IPP - project 2
+VUT FIT 2024
+*/
 namespace IPP\Student\Exception;
 
 use IPP\Core\Exception\IPPException;

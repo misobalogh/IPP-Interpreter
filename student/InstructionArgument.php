@@ -1,4 +1,10 @@
 <?php
+/*
+Michal Balogh, xbalog06
+IPP - project 2
+VUT FIT 2024
+*/
+
 
 namespace IPP\Student;
 
@@ -46,12 +52,16 @@ class InstructionArgument
 
     /**
      * @throws FrameAccessException
+     * 
+     * Check if the argument is defined in the frame
      */
     public function isDefined(): bool
     {
         if ($this->isVar()) {
+            // check if the variable is defined in the frame or if not, check if it is defined in the global frame            
             return ProgramFlow::getFrame($this->frame)?->keyExists($this->value) || ProgramFlow::getGlobalFrame()->keyExists($this->value);
         } else if ($this->isLabel()) {
+            // in case of label, check if the label exists
             return ProgramFlow::labelExists($this->value);
         } else {
             return true;
@@ -61,6 +71,8 @@ class InstructionArgument
 
     /**
      * @throws FrameAccessException
+     * 
+     * Get the value of the argument from the frame
      */
     public function getValue(): mixed
     {
@@ -73,6 +85,8 @@ class InstructionArgument
 
     /**
      * @throws FrameAccessException
+     * 
+     * Get the type of the argument from the frame
      */
     public function getType(): mixed
     {
