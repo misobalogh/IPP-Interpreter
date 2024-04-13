@@ -4,21 +4,18 @@ namespace IPP\Student;
 
 use IPP\Core\Exception\InternalErrorException;
 use IPP\Student\Exception\XMLStructureException;
-use IPP\Core\StreamWriter;
-use IPP\Core\FileInputReader;
-use IPP\Core\FileSourceReader;
-
+use IPP\Core\Interface\InputReader;
+use IPP\Core\Interface\OutputWriter;
 
 require_once "Instruction.php";
 
-
 class InstructionFactory
 {
-    private FileInputReader $stdin;
-    private StreamWriter $stdout;
-    private StreamWriter $stderr;
+    private InputReader $stdin;
+    private OutputWriter $stdout;
+    private OutputWriter $stderr;
 
-    public function __construct(FileInputReader $stdin, StreamWriter $stdout, StreamWriter $stderr)
+    public function __construct(InputReader $stdin, OutputWriter $stdout, OutputWriter $stderr)
     {
         $this->stdin = $stdin;
         $this->stdout = $stdout;

@@ -2,7 +2,6 @@
 
 namespace IPP\Student;
 
-use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\WrongOperandTypeException;
 use IPP\Student\Exception\UndefinedVariableException;
 use IPP\Student\Exception\OperandValueException;
@@ -11,7 +10,9 @@ use IPP\Student\Exception\XMLStructureException;
 use IPP\Student\Exception\StringOperationException;
 use IPP\Student\Exception\ValueException;
 use IPP\Core\StreamWriter;
+use IPP\Core\Interface\OutputWriter;
 use IPP\Core\FileInputReader;
+use IPP\Core\Interface\InputReader;
 
 #=========== Abstract class for instructions ===========
 
@@ -28,6 +29,9 @@ abstract class Instruction
         $this->arg3 = $instructionData->arg3;
     }
 
+    /**
+     * @throws UndefinedVariableException
+     */
     final public function checkArgs() : void
     {
         foreach ([$this->arg1, $this->arg2, $this->arg3] as $arg) {
@@ -473,7 +477,7 @@ class InstructionInt2Char extends Instruction
 
         $symbol1_value = $this->arg2->getValue();
         $converted = mb_chr($symbol1_value);
-        if ($converted === false) {
+        if ($converted == false) {
             throw new StringOperationException("Invalid ordinal value");
         }
 
@@ -513,7 +517,7 @@ class InstructionStri2Int extends Instruction
         }
 
         $converted = mb_ord($symbol1_value[$symbol2_value]);
-        if ($converted === false) {
+        if ($converted == false) {
             throw new StringOperationException("Error during conversion");
         }
 
@@ -532,13 +536,17 @@ class InstructionStri2Int extends Instruction
 
 class InstructionRead extends Instruction
 {
-    public function __construct(InstructionData $instructionData, private FileInputReader $stdin)
+    public function __construct(InstructionData $instructionData, private InputReader $stdin)
     {
         parent::__construct($instructionData);
 
+        if (!($stdin instanceof FileInputReader)) {
+            throw new XMLStructureException("Cannot read from file");
+        }
     }
 
-    public function execute(): int{
+    public function execute(): int
+    {
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -553,19 +561,13 @@ class InstructionRead extends Instruction
         $valueSet = $this->arg1->value;
         $frameSet = $this->arg1->frame;
 
+        $input = null;
         if (strcasecmp($type, DataType::INT) === 0) {
             $input = $this->stdin->readInt();
-        }
-
-        else if (strcasecmp($type, DataType::BOOL) === 0) {
+        } elseif (strcasecmp($type, DataType::BOOL) === 0) {
             $input = $this->stdin->readBool();
-        }
-
-        else if (strcasecmp($type, DataType::STRING) === 0){
+        } elseif (strcasecmp($type, DataType::STRING) === 0) {
             $input = $this->stdin->readString();
-        }
-        else {
-            $input = null;
         }
 
         if ($input === null) {
@@ -578,11 +580,16 @@ class InstructionRead extends Instruction
     }
 }
 
+
 class InstructionWrite extends Instruction
 {
-    public function __construct(InstructionData $instructionData, private StreamWriter $stdout)
+    public function __construct(InstructionData $instructionData, private OutputWriter $stdout)
     {
         parent::__construct($instructionData);
+
+        if (!($stdout instanceof StreamWriter)) {
+            throw new XMLStructureException("Cannot write to file");
+        }
 
     }
 
@@ -731,7 +738,7 @@ class InstructionSetChar extends Instruction
         $symbol1_value = $this->arg2->getValue();
         $symbol2_value = $this->arg3->getValue();
         if (strlen($symbol2_value) > 1) {
-            $symbol2_value = symbol2_value[0];
+            $symbol2_value = $symbol2_value[0];
         }
 
         $valueSet = $this->arg1->value;
@@ -884,9 +891,13 @@ class InstructionExit extends Instruction
 
 class InstructionDprint extends Instruction
 {
-    public function __construct(InstructionData $instructionData, private StreamWriter $stderr)
+    public function __construct(InstructionData $instructionData, private OutputWriter $stderr)
     {
         parent::__construct($instructionData);
+
+        if (!($stderr instanceof StreamWriter)) {
+            throw new XMLStructureException("Cannot write to file");
+        }
     }
 
     public function execute(): int{
@@ -924,9 +935,13 @@ class InstructionDprint extends Instruction
 
 class InstructionBreak extends Instruction
 {
-    public function __construct(InstructionData $instructionData, private StreamWriter $stderr)
+    public function __construct(InstructionData $instructionData, private OutputWriter $stderr)
     {
         parent::__construct($instructionData);
+
+        if (!($stderr instanceof StreamWriter)) {
+            throw new XMLStructureException("Cannot write to file");
+        }
     }
 
     public function execute(): int{

@@ -4,6 +4,7 @@ namespace IPP\Student;
 
 use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\FrameAccessException;
+use JetBrains\PhpStorm\NoReturn;
 
 
 class ProgramFlow
@@ -25,10 +26,14 @@ class ProgramFlow
      * @var Frame[]
      */
     private static array $callStack;
+
     private static Frame $globalFrame;
+    
     private static ?Frame $temporaryFrame;
 
-
+    /**
+     * @var array<string, mixed>[]
+     */
     private static array $dataStack;
 
     public static int $executedInstructionCount = 0;
@@ -70,7 +75,7 @@ class ProgramFlow
         array_push(self::$callStack, $instructionPointer);
     }
 
-    public static function popFromCallStack(): ?int
+    public static function popFromCallStack(): mixed
     {
         return array_pop(self::$callStack);
     }
@@ -189,7 +194,7 @@ class ProgramFlow
         }
 
         if ($currentFrame->keyExists($key)) {
-            throw new SemanticErrorException("Rededfinition of variable $key");
+            throw new SemanticErrorException("Redefinition of variable $key");
         }
         else {
             $currentFrame->setData($key, $type, $value);
@@ -242,7 +247,7 @@ class ProgramFlow
             throw new FrameAccessException("No temporary frame");
         }
         if (self::$temporaryFrame->keyExists($key)) {
-            throw new SemanticErrorException("Rededfinition of variable $key");
+            throw new SemanticErrorException("Redefinition of variable $key");
         }
         else {
             self::$temporaryFrame->setData($key, $type, $value);
@@ -275,11 +280,18 @@ class ProgramFlow
 
 
     // STACK
+
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function pushToDataStack(array $data): void
     {
-        array_push(self::$dataStack, $data);
+        self::$dataStack[] = $data;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public static function popFromDataStack() : ?array
     {
         return array_pop(self::$dataStack);
