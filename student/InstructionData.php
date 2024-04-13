@@ -2,31 +2,24 @@
 
 namespace IPP\Student;
 
-use IPP\Student\Exception\SemanticErrorException;
+use DOMElement;
 use IPP\Student\Exception\XMLStructureException;
-use IPP\Student\Exception\OperandValueException;
-use IPP\Student\Exception\FrameAccessException;
 
 class InstructionData
 {
-    /** @var \DOMElement */
-    public $instruction;
-    /** @var int */
-    public $order;
-    /** @var string */
-    public $opcode;
-    /** @var InstructionArgument */
-    public $arg1 = null;
-    /** @var InstructionArgument */
-    public $arg2 = null;
-    /** @var InstructionArgument */
-    public $arg3 = null;
+    public DOMElement $instruction;
+    public int $order;
+    public string $opcode;
+    public ?InstructionArgument $arg1 = null;
+    public ?InstructionArgument $arg2 = null;
+    public ?InstructionArgument $arg3 = null;
 
     /**
      * InstructionData constructor.
-     * @param \DOMElement $instruction
+     * @param DOMElement $instruction
+     * @throws XMLStructureException
      */
-    final public function __construct($instruction)
+    final public function __construct(DOMElement $instruction)
     {
         $this->instruction = $instruction;
         $this->setOrder();
@@ -44,19 +37,22 @@ class InstructionData
         $this->opcode = $this->instruction->getAttribute('opcode'); 
     }
 
+    /**
+     * @throws XMLStructureException
+     */
     private function setArgs() : void
     {
         $childNodes = $this->instruction->childNodes;
 
         foreach ($childNodes as $arg) {
-            if ($arg->nodeType === XML_ELEMENT_NODE && strpos($arg->nodeName, 'arg') === 0 && $arg instanceof \DOMElement) {
+            if ($arg->nodeType === XML_ELEMENT_NODE && str_starts_with($arg->nodeName, 'arg') && $arg instanceof DOMElement) {
                 $type = trim($arg->getAttribute('type'));
-                if (!in_array($type, [DataType::INT, DataType::BOOL, DataType::STRING, DataType::NIL, DataType::TYPE, DataType::LABEL, DataType::VAR])) {
+                if (!in_array($type, [Types\DataType::INT, Types\DataType::BOOL, Types\DataType::STRING, Types\DataType::NIL, Types\DataType::TYPE, Types\DataType::LABEL, Types\DataType::VAR])) {
                     throw new XMLStructureException("Invalid argument type");
                 }
                 $argName = trim($arg->nodeValue);
-                if ($argName !== '' || $type === DataType::STRING) {
-                    if ($type === DataType::VAR) {
+                if ($argName !== '' || $type === Types\DataType::STRING) {
+                    if ($type === Types\DataType::VAR) {
                         list($frame, $value) = array_map('trim', explode('@', $argName));
                         if (!in_array($frame, ['GF', 'LF', 'TF'])) {
                             throw new XMLStructureException("Invalid frame");
@@ -99,133 +95,3 @@ class InstructionData
     }
 }
 
-
-
-
-/**
- * Class InstructionArgument
- * 
- * Class for storing argument of instruction
- *
- * @property string $type
- * @property string $frame
- * @property int|bool|string $value
- */
-class InstructionArgument
-{
-    public string $type;
-    public ?string $frame;
-    /** @var int|bool|string */
-    public $value;
-
-    /**
-     * InstructionArgument constructor.
-     * @param string $type
-     * @param string|null $frame
-     * @param int|bool|string $value
-     */
-    public function __construct(string $type, ?string $frame, $value)
-    {
-        $this->type = $type;
-        $this->frame = $frame;
-        if ($type === DataType::INT) {
-            if (!is_numeric($value)) {
-                throw new XMLStructureException("Invalid value for int type");
-            }
-            $this->value = (int)$value;
-        }
-        else if ($type === DataType::BOOL) {
-            $this->value = $value === "true";
-        }
-        else {
-            $this->value = $value;
-        }
-    }
-
-    public function isDefined(): bool
-    {   
-        if ($this->isVar())
-        {   
-            return ProgramFlow::getFrame($this->frame)?->keyExists($this->value) || ProgramFlow::getGlobalFrame()->keyExists($this->value);
-        }
-        else if ($this->isLabel())
-        {
-            return ProgramFlow::labelExists($this->value);
-        }
-        else
-        {
-            return true;
-        }
-        
-    }
-
-    public function getValue() : mixed
-    {
-        if ($this->isVar())
-        {
-            return ProgramFlow::getFrame($this->frame)->getData($this->value)["value"];
-        }
-        else
-        {
-            return $this->value;
-        }
-    }
-
-    public function getType() : mixed
-    {
-        if ($this->isVar())
-        {
-            return ProgramFlow::getFrame($this->frame)->getData($this->value)["type"];
-        }
-        else
-        {
-            return $this->type;
-        }
-    }
-
-    public function isVar(): bool
-    {
-        return $this->type === DataType::VAR;
-    }
-
-    public function isLabel(): bool
-    {
-        return $this->type === DataType::LABEL;
-    }
-
-    public function isType(): bool
-    {
-        return $this->type === DataType::TYPE;
-    }
-
-    public function isNil(): bool
-    {
-        return $this->type === DataType::NIL;
-    }
-
-    public function isBool(): bool
-    {
-        return $this->type === DataType::BOOL;
-    }
-
-    public function isInt(): bool
-    {
-        return $this->type === DataType::INT;
-    }
-
-    public function isString(): bool
-    {
-        return $this->type === DataType::STRING;
-    }
-}
-
-class DataType
-{
-    const INT = "int";
-    const BOOL = "bool";
-    const STRING = "string";
-    const NIL = "nil";
-    const TYPE = "type";
-    const LABEL = "label";
-    const VAR = "var";
-}

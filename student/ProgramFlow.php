@@ -4,7 +4,6 @@ namespace IPP\Student;
 
 use IPP\Student\Exception\SemanticErrorException;
 use IPP\Student\Exception\FrameAccessException;
-use JetBrains\PhpStorm\NoReturn;
 
 
 class ProgramFlow
@@ -40,8 +39,10 @@ class ProgramFlow
 
     /**
      * @param InstructionData[] $instructionList
+     * @throws SemanticErrorException
+     * @throws SemanticErrorException
      */
-    public static function initialize($instructionList): void
+    public static function initialize(array $instructionList): void
     {
         self::$instructionPointer = 0;
         self::$instructionList = $instructionList;
@@ -72,7 +73,7 @@ class ProgramFlow
 
     public static function pushToCallStack(int $instructionPointer): void
     {
-        array_push(self::$callStack, $instructionPointer);
+        self::$callStack[] = $instructionPointer;
     }
 
     public static function popFromCallStack(): mixed
@@ -80,20 +81,19 @@ class ProgramFlow
         return array_pop(self::$callStack);
     }
 
-    public static function getInstruction(): InstructionData
-    {
-        return self::$instructionList[self::$instructionPointer];
-    }
-
-
-
-
     //  LABELS
+
+    /**
+     * @throws SemanticErrorException
+     */
     public static function jumpTo(string $label): void
     {
         self::$instructionPointer = self::getLabel($label);
     }
 
+    /**
+     * @throws SemanticErrorException
+     */
     private static function getLabel(string $label): int
     {
         if (!array_key_exists($label, self::$labels)) {
@@ -102,6 +102,9 @@ class ProgramFlow
         return  (int)self::$labels[$label];
     }
 
+    /**
+     * @throws SemanticErrorException
+     */
     public static function labelExists(string $label) : bool {
         if (self::getLabel($label) == null) {
             return false;
@@ -111,6 +114,8 @@ class ProgramFlow
 
     /**
      * @return string[]
+     * @throws SemanticErrorException
+     * @throws SemanticErrorException
      */
     private static function findLabels(): array
     {
@@ -127,6 +132,10 @@ class ProgramFlow
     }
     
     // FRAMES
+
+    /**
+     * @throws FrameAccessException
+     */
     public static function getFrame(string $frameType): ?Frame{
         if ($frameType === FrameType::GLOBAL) {
             return self::$globalFrame;
@@ -140,7 +149,7 @@ class ProgramFlow
         else {
             return self::getCurrentFrame();
         }
-    } 
+    }
 
 
     /**
@@ -148,8 +157,10 @@ class ProgramFlow
      * @param string $key
      * @param string|null $type
      * @param mixed $value
+     * @throws FrameAccessException
+     * @throws SemanticErrorException
      */
-    public static function addToFrame(string $frameType, string $key, ?string $type, $value): void
+    public static function addToFrame(string $frameType, string $key, ?string $type, mixed $value): void
     {
         if ($frameType == FrameType::GLOBAL) {
             self::addToGlobalFrame($key, $type, $value);
@@ -164,7 +175,7 @@ class ProgramFlow
 
     public static function pushFrame(Frame $frame): void
     {
-        array_push(self::$frames, $frame);
+        self::$frames[] = $frame;
     }
 
     public static function popFrame(): ?Frame
@@ -185,8 +196,10 @@ class ProgramFlow
      * @param string $key
      * @param string|null $type
      * @param mixed $value
+     * @throws FrameAccessException
+     * @throws SemanticErrorException
      */
-    public static function addToLocalFrame(string $key, ?string $type, $value): void
+    public static function addToLocalFrame(string $key, ?string $type, mixed $value): void
     {
         $currentFrame = self::getCurrentFrame();
         if ($currentFrame === null) {
@@ -205,8 +218,10 @@ class ProgramFlow
      * @param string $key
      * @param string|null $type
      * @param mixed $value
+     * @throws SemanticErrorException
+     * @throws SemanticErrorException
      */
-    public static function addToGlobalFrame(string $key, ?string $type, $value): void
+    public static function addToGlobalFrame(string $key, ?string $type, mixed $value): void
     {
         if (self::$globalFrame->keyExists($key)) {
             throw new SemanticErrorException("Redefinition of variable $key");
@@ -240,8 +255,10 @@ class ProgramFlow
      * @param string $key
      * @param string|null $type
      * @param mixed $value
+     * @throws FrameAccessException
+     * @throws SemanticErrorException
      */
-    public static function addToTemporaryFrame(string $key, ?string $type, $value): void
+    public static function addToTemporaryFrame(string $key, ?string $type, mixed $value): void
     {
         if (self::$temporaryFrame === null) {
             throw new FrameAccessException("No temporary frame");

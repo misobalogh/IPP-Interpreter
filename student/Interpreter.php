@@ -3,9 +3,6 @@
 namespace IPP\Student;
 
 use IPP\Core\AbstractInterpreter;
-use IPP\Core\Exception\NotImplementedException;
-use IPP\Student\InstructionFactory;
-use IPP\Student\Exception\XMLFormatException;
 use IPP\Student\Exception\XMLStructureException;
 
 
@@ -16,6 +13,9 @@ class Interpreter extends AbstractInterpreter
      */
     private array $instructions;
 
+    /**
+     * @throws XMLStructureException
+     */
     public function execute(): int
     {
         $dom = $this->source->getDOMDocument();
@@ -48,7 +48,7 @@ class Interpreter extends AbstractInterpreter
      * @param \DOMDocument $dom
      * @throws XMLStructureException
      */
-    private function setInstructionsData($dom) : void
+    private function setInstructionsData(\DOMDocument $dom) : void
     {
         $instructionsArray = array();
         foreach ($dom->getElementsByTagName('instruction') as $instruction) {
@@ -87,7 +87,7 @@ class Interpreter extends AbstractInterpreter
      * @param \DOMDocument $dom
      * @throws XMLStructureException
      */
-    private function checkHeader($dom) : void
+    private function checkHeader(\DOMDocument $dom) : void
     {
         $rootElement = $dom->documentElement;
         if ($rootElement->nodeName !== 'program' || $rootElement->getAttribute('language') !== 'IPPcode24') {

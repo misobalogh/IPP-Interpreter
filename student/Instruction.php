@@ -2,17 +2,16 @@
 
 namespace IPP\Student;
 
-use IPP\Student\Exception\WrongOperandTypeException;
-use IPP\Student\Exception\UndefinedVariableException;
-use IPP\Student\Exception\OperandValueException;
-use IPP\Student\Exception\FrameAccessException;
-use IPP\Student\Exception\XMLStructureException;
-use IPP\Student\Exception\StringOperationException;
-use IPP\Student\Exception\ValueException;
-use IPP\Core\StreamWriter;
-use IPP\Core\Interface\OutputWriter;
-use IPP\Core\FileInputReader;
 use IPP\Core\Interface\InputReader;
+use IPP\Core\Interface\OutputWriter;
+use IPP\Student\Exception\FrameAccessException;
+use IPP\Student\Exception\OperandValueException;
+use IPP\Student\Exception\StringOperationException;
+use IPP\Student\Exception\UndefinedVariableException;
+use IPP\Student\Exception\ValueException;
+use IPP\Student\Exception\WrongOperandTypeException;
+use IPP\Student\Exception\XMLStructureException;
+use IPP\Student\Types\DataType;
 
 #=========== Abstract class for instructions ===========
 
@@ -49,6 +48,11 @@ abstract class Instruction
 
 class InstructionMove extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 == null || $this->arg2 == null || $this->arg3 !== null) {
@@ -80,6 +84,9 @@ class InstructionCreateFrame extends Instruction
 
 class InstructionPushFrame extends Instruction
 {
+    /**
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $temporaryFrame = ProgramFlow::getTemporaryFrame();
         if ($temporaryFrame === null) {
@@ -95,6 +102,9 @@ class InstructionPushFrame extends Instruction
 
 class InstructionPopFrame extends Instruction
 {
+    /**
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $frame = ProgramFlow::popFrame();
         if ($frame === null) {
@@ -109,6 +119,9 @@ class InstructionPopFrame extends Instruction
 
 class InstructionDefVar extends Instruction
 {
+    /**
+     * @throws XMLStructureException
+     */
     public function execute(): int {
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
             throw new XMLStructureException("Missing argument");
@@ -120,6 +133,10 @@ class InstructionDefVar extends Instruction
 
 class InstructionCall extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
@@ -135,6 +152,9 @@ class InstructionCall extends Instruction
 
 class InstructionReturn extends Instruction
 {
+    /**
+     * @throws ValueException
+     */
     public function execute(): int{
         $pointer = ProgramFlow::popFromCallStack();
         if ($pointer === null) {
@@ -153,6 +173,10 @@ class InstructionReturn extends Instruction
 
 class InstructionPushs extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException|FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
 
@@ -173,6 +197,12 @@ class InstructionPushs extends Instruction
 
 class InstructionPops extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws ValueException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
 
@@ -203,6 +233,12 @@ class InstructionPops extends Instruction
 
 class InstructionAdd extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -229,6 +265,12 @@ class InstructionAdd extends Instruction
 
 class InstructionSub extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -256,6 +298,12 @@ class InstructionSub extends Instruction
 
 class InstructionMul extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -283,6 +331,13 @@ class InstructionMul extends Instruction
 
 class InstructionIDiv extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     * @throws OperandValueException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -314,6 +369,12 @@ class InstructionIDiv extends Instruction
 
 class InstructionLt extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -342,6 +403,12 @@ class InstructionLt extends Instruction
 
 class InstructionGt extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -370,6 +437,12 @@ class InstructionGt extends Instruction
 
 class InstructionEq extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -393,6 +466,12 @@ class InstructionEq extends Instruction
 
 class InstructionAnd extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -417,6 +496,12 @@ class InstructionAnd extends Instruction
 
 class InstructionOr extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -441,6 +526,12 @@ class InstructionOr extends Instruction
 
 class InstructionNot extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
@@ -464,6 +555,13 @@ class InstructionNot extends Instruction
 
 class InstructionInt2Char extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws StringOperationException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
@@ -477,7 +575,7 @@ class InstructionInt2Char extends Instruction
 
         $symbol1_value = $this->arg2->getValue();
         $converted = mb_chr($symbol1_value);
-        if ($converted == false) {
+        if (!$converted) {
             throw new StringOperationException("Invalid ordinal value");
         }
 
@@ -492,6 +590,13 @@ class InstructionInt2Char extends Instruction
 
 class InstructionStri2Int extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws StringOperationException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
 
@@ -517,7 +622,7 @@ class InstructionStri2Int extends Instruction
         }
 
         $converted = mb_ord($symbol1_value[$symbol2_value]);
-        if ($converted == false) {
+        if (!$converted) {
             throw new StringOperationException("Error during conversion");
         }
 
@@ -536,15 +641,16 @@ class InstructionStri2Int extends Instruction
 
 class InstructionRead extends Instruction
 {
-    public function __construct(InstructionData $instructionData, private InputReader $stdin)
+    public function __construct(InstructionData $instructionData, private readonly InputReader $stdin)
     {
         parent::__construct($instructionData);
-
-        if (!($stdin instanceof FileInputReader)) {
-            throw new XMLStructureException("Cannot read from file");
-        }
     }
 
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws FrameAccessException
+     */
     public function execute(): int
     {
         $this->checkArgs();
@@ -583,16 +689,15 @@ class InstructionRead extends Instruction
 
 class InstructionWrite extends Instruction
 {
-    public function __construct(InstructionData $instructionData, private OutputWriter $stdout)
+    public function __construct(InstructionData $instructionData, private readonly OutputWriter $stdout)
     {
         parent::__construct($instructionData);
-
-        if (!($stdout instanceof StreamWriter)) {
-            throw new XMLStructureException("Cannot write to file");
-        }
-
     }
 
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException|FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();       
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
@@ -636,6 +741,12 @@ class InstructionWrite extends Instruction
 
 class InstructionConcat extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -663,6 +774,12 @@ class InstructionConcat extends Instruction
 
 class InstructionStrlen extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
@@ -673,12 +790,12 @@ class InstructionStrlen extends Instruction
             throw new WrongOperandTypeException("STRLEN accepts only strings");
         }
 
-        $symbol1_vlaue = $this->arg2->getValue();
+        $symbol1_value = $this->arg2->getValue();
 
         $valueSet = $this->arg1->value;
         $frameSet = $this->arg1->frame;
 
-        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, strlen($symbol1_vlaue));
+        ProgramFlow::getFrame($frameSet)->setData($valueSet, DataType::INT, strlen($symbol1_value));
         
         return 0;
     }
@@ -686,6 +803,13 @@ class InstructionStrlen extends Instruction
 
 class InstructionGetChar extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws StringOperationException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -719,6 +843,13 @@ class InstructionGetChar extends Instruction
 
 class InstructionSetChar extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws StringOperationException
+     * @throws WrongOperandTypeException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -766,6 +897,11 @@ class InstructionSetChar extends Instruction
 
 class InstructionType extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 !== null) {
@@ -800,6 +936,10 @@ class InstructionLabel extends Instruction
 
 class InstructionJump extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
@@ -812,6 +952,11 @@ class InstructionJump extends Instruction
 
 class InstructionJumpIfEQ extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException|FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -839,6 +984,11 @@ class InstructionJumpIfEQ extends Instruction
 
 class InstructionJumpIfNEQ extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException|FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 === null || $this->arg3 === null) {
@@ -865,6 +1015,12 @@ class InstructionJumpIfNEQ extends Instruction
 
 class InstructionExit extends Instruction
 {
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException
+     * @throws WrongOperandTypeException
+     * @throws OperandValueException|FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
@@ -891,15 +1047,15 @@ class InstructionExit extends Instruction
 
 class InstructionDprint extends Instruction
 {
-    public function __construct(InstructionData $instructionData, private OutputWriter $stderr)
+    public function __construct(InstructionData $instructionData, private readonly OutputWriter $stderr)
     {
         parent::__construct($instructionData);
-
-        if (!($stderr instanceof StreamWriter)) {
-            throw new XMLStructureException("Cannot write to file");
-        }
     }
 
+    /**
+     * @throws UndefinedVariableException
+     * @throws XMLStructureException|FrameAccessException
+     */
     public function execute(): int{
         $this->checkArgs();
         if ($this->arg1 === null || $this->arg2 !== null || $this->arg3 !== null) {
@@ -935,13 +1091,9 @@ class InstructionDprint extends Instruction
 
 class InstructionBreak extends Instruction
 {
-    public function __construct(InstructionData $instructionData, private OutputWriter $stderr)
+    public function __construct(InstructionData $instructionData, private readonly OutputWriter $stderr)
     {
         parent::__construct($instructionData);
-
-        if (!($stderr instanceof StreamWriter)) {
-            throw new XMLStructureException("Cannot write to file");
-        }
     }
 
     public function execute(): int{

@@ -2,7 +2,6 @@
 
 namespace IPP\Student;
 
-use IPP\Core\Exception\InternalErrorException;
 use IPP\Student\Exception\XMLStructureException;
 use IPP\Core\Interface\InputReader;
 use IPP\Core\Interface\OutputWriter;
@@ -23,82 +22,49 @@ class InstructionFactory
     }
 
 
+    /**
+     * @throws XMLStructureException
+     */
     public function createInstruction(InstructionData $instructionData): Instruction{
         $opcode = $instructionData->opcode;
-        switch (strtoupper($opcode)) {
-            case OP_codes::MOVE:
-                return new InstructionMove($instructionData);
-            case OP_codes::CREATEFRAME:
-                return new InstructionCreateFrame($instructionData);
-            case OP_codes::PUSHFRAME:
-                return new InstructionPushFrame($instructionData);
-            case OP_codes::POPFRAME:
-                return new InstructionPopFrame($instructionData);
-            case OP_codes::DEFVAR:
-                return new InstructionDefVar($instructionData);
-            case OP_codes::CALL:
-                return new InstructionCall($instructionData);
-            case OP_codes::RETURN:
-                return new InstructionReturn($instructionData);
-            case OP_codes::PUSHS:
-                return new InstructionPushs($instructionData);
-            case OP_codes::POPS:
-                return new InstructionPops($instructionData);
-            case OP_codes::ADD:
-                return new InstructionAdd($instructionData);
-            case OP_codes::SUB:
-                return new InstructionSub($instructionData);
-            case OP_codes::MUL:
-                return new InstructionMul($instructionData);
-            case OP_codes::IDIV:
-                return new InstructionIDiv($instructionData);
-            case OP_codes::LT:
-                return new InstructionLt($instructionData);
-            case OP_codes::GT:
-                return new InstructionGt($instructionData);
-            case OP_codes::EQ:
-                return new InstructionEq($instructionData);
-            case OP_codes::AND:
-                return new InstructionAnd($instructionData);
-            case OP_codes::OR:
-                return new InstructionOr($instructionData);
-            case OP_codes::NOT:
-                return new InstructionNot($instructionData);
-            case OP_codes::INT2CHAR:
-                return new InstructionInt2Char($instructionData);
-            case OP_codes::STRI2INT:
-                return new InstructionStri2Int($instructionData);
-            case OP_codes::READ:
-                return new InstructionRead($instructionData, $this->stdin);
-            case OP_codes::WRITE:
-                return new InstructionWrite($instructionData, $this->stdout);
-            case OP_codes::CONCAT:
-                return new InstructionConcat($instructionData);
-            case OP_codes::STRLEN:
-                return new InstructionStrlen($instructionData);
-            case OP_codes::GETCHAR:
-                return new InstructionGetChar($instructionData);
-            case OP_codes::SETCHAR:
-                return new InstructionSetChar($instructionData);
-            case OP_codes::TYPE:
-                return new InstructionType($instructionData);
-            case OP_codes::LABEL:
-                return new InstructionLabel($instructionData);
-            case OP_codes::JUMP:
-                return new InstructionJump($instructionData);
-            case OP_codes::JUMPIFEQ:
-                return new InstructionJumpIfEQ($instructionData);
-            case OP_codes::JUMPIFNEQ:
-                return new InstructionJumpIfNEQ($instructionData);
-            case OP_codes::EXIT:
-                return new InstructionExit($instructionData);
-            case OP_codes::DPRINT:
-                return new InstructionDprint($instructionData, $this->stderr);
-            case OP_codes::BREAK:
-                return new InstructionBreak($instructionData, $this->stderr);
-            default:
-                throw new XMLStructureException("Unknown opcode: $opcode");
-        }
+        return match (strtoupper($opcode)) {
+            OP_codes::MOVE => new InstructionMove($instructionData),
+            OP_codes::CREATEFRAME => new InstructionCreateFrame($instructionData),
+            OP_codes::PUSHFRAME => new InstructionPushFrame($instructionData),
+            OP_codes::POPFRAME => new InstructionPopFrame($instructionData),
+            OP_codes::DEFVAR => new InstructionDefVar($instructionData),
+            OP_codes::CALL => new InstructionCall($instructionData),
+            OP_codes::RETURN => new InstructionReturn($instructionData),
+            OP_codes::PUSHS => new InstructionPushs($instructionData),
+            OP_codes::POPS => new InstructionPops($instructionData),
+            OP_codes::ADD => new InstructionAdd($instructionData),
+            OP_codes::SUB => new InstructionSub($instructionData),
+            OP_codes::MUL => new InstructionMul($instructionData),
+            OP_codes::IDIV => new InstructionIDiv($instructionData),
+            OP_codes::LT => new InstructionLt($instructionData),
+            OP_codes::GT => new InstructionGt($instructionData),
+            OP_codes::EQ => new InstructionEq($instructionData),
+            OP_codes::AND => new InstructionAnd($instructionData),
+            OP_codes::OR => new InstructionOr($instructionData),
+            OP_codes::NOT => new InstructionNot($instructionData),
+            OP_codes::INT2CHAR => new InstructionInt2Char($instructionData),
+            OP_codes::STRI2INT => new InstructionStri2Int($instructionData),
+            OP_codes::READ => new InstructionRead($instructionData, $this->stdin),
+            OP_codes::WRITE => new InstructionWrite($instructionData, $this->stdout),
+            OP_codes::CONCAT => new InstructionConcat($instructionData),
+            OP_codes::STRLEN => new InstructionStrlen($instructionData),
+            OP_codes::GETCHAR => new InstructionGetChar($instructionData),
+            OP_codes::SETCHAR => new InstructionSetChar($instructionData),
+            OP_codes::TYPE => new InstructionType($instructionData),
+            OP_codes::LABEL => new InstructionLabel($instructionData),
+            OP_codes::JUMP => new InstructionJump($instructionData),
+            OP_codes::JUMPIFEQ => new InstructionJumpIfEQ($instructionData),
+            OP_codes::JUMPIFNEQ => new InstructionJumpIfNEQ($instructionData),
+            OP_codes::EXIT => new InstructionExit($instructionData),
+            OP_codes::DPRINT => new InstructionDprint($instructionData, $this->stderr),
+            OP_codes::BREAK => new InstructionBreak($instructionData, $this->stderr),
+            default => throw new XMLStructureException("Unknown opcode: $opcode"),
+        };
     }
 }
 
@@ -107,40 +73,40 @@ class InstructionFactory
  * Enum of opcodes
  */
 class OP_codes {
-    const MOVE = "MOVE";
-    const CREATEFRAME = "CREATEFRAME";
-    const PUSHFRAME = "PUSHFRAME";
-    const POPFRAME = "POPFRAME";
-    const DEFVAR = "DEFVAR";
-    const CALL = "CALL";
-    const RETURN = "RETURN";
-    const PUSHS = "PUSHS";
-    const POPS = "POPS";
-    const ADD = "ADD";
-    const SUB = "SUB";
-    const MUL = "MUL";
-    const IDIV = "IDIV";
-    const LT = "LT";
-    const GT = "GT";
-    const EQ = "EQ";
-    const AND = "AND";
-    const OR = "OR";
-    const NOT = "NOT";
-    const INT2CHAR = "INT2CHAR";
-    const STRI2INT = "STRI2INT";
-    const READ = "READ";
-    const WRITE = "WRITE";
-    const CONCAT = "CONCAT";
-    const STRLEN = "STRLEN";
-    const GETCHAR = "GETCHAR";
-    const SETCHAR = "SETCHAR";
-    const TYPE = "TYPE";
-    const LABEL = "LABEL";
-    const JUMP = "JUMP";
-    const JUMPIFEQ = "JUMPIFEQ";
-    const JUMPIFNEQ = "JUMPIFNEQ";
-    const EXIT = "EXIT";
-    const DPRINT = "DPRINT";
-    const BREAK = "BREAK";
+    const string MOVE = "MOVE";
+    const string CREATEFRAME = "CREATEFRAME";
+    const string PUSHFRAME = "PUSHFRAME";
+    const string POPFRAME = "POPFRAME";
+    const string DEFVAR = "DEFVAR";
+    const string CALL = "CALL";
+    const string RETURN = "RETURN";
+    const string PUSHS = "PUSHS";
+    const string POPS = "POPS";
+    const string ADD = "ADD";
+    const string SUB = "SUB";
+    const string MUL = "MUL";
+    const string IDIV = "IDIV";
+    const string LT = "LT";
+    const string GT = "GT";
+    const string EQ = "EQ";
+    const string AND = "AND";
+    const string OR = "OR";
+    const string NOT = "NOT";
+    const string INT2CHAR = "INT2CHAR";
+    const string STRI2INT = "STRI2INT";
+    const string READ = "READ";
+    const string WRITE = "WRITE";
+    const string CONCAT = "CONCAT";
+    const string STRLEN = "STRLEN";
+    const string GETCHAR = "GETCHAR";
+    const string SETCHAR = "SETCHAR";
+    const string TYPE = "TYPE";
+    const string LABEL = "LABEL";
+    const string JUMP = "JUMP";
+    const string JUMPIFEQ = "JUMPIFEQ";
+    const string JUMPIFNEQ = "JUMPIFNEQ";
+    const string EXIT = "EXIT";
+    const string DPRINT = "DPRINT";
+    const string BREAK = "BREAK";
 }
 
