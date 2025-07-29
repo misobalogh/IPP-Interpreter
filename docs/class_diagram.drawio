@@ -1,0 +1,95 @@
+<mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" background="none" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- AbstractInterpreter (from core) -->
+    <mxCell id="node1" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;AbstractInterpreter&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __construct(settings): &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; input: InputReader&lt;br/&gt; settings: Settings&lt;br/&gt; source: SourceReader&lt;br/&gt; stderr: OutputWriter&lt;br/&gt; stdout: OutputWriter&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; execute(): int&lt;br/&gt; init(): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="515" y="-306" width="179" height="233" as="geometry" />
+    </mxCell>
+
+    <!-- Interpreter extends AbstractInterpreter -->
+    <mxCell id="node4" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Interpreter&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; instructions: InstructionData[]&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; checkHeader(dom): void&lt;br/&gt; execute(): int&lt;br/&gt; setInstructionsData(dom): void&lt;br/&gt; usortInstructions(inst1, inst2): int&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="485" y="22" width="239" height="160" as="geometry" />
+    </mxCell>
+
+    <!-- Frame -->
+    <mxCell id="node7" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Frame&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __construct(): &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; data: array&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; getData(key): array&lt;br/&gt; keyExists(key): bool&lt;br/&gt; setData(key, type, value): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="485" y="241" width="210" height="161" as="geometry" />
+    </mxCell>
+
+    <!-- Abstract Instruction class -->
+    <mxCell id="node6" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;&lt;&lt;abstract&gt;&gt;&lt;br/&gt;Instruction&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __construct(instructionData): &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; arg1: ?InstructionArgument&lt;br/&gt; arg2: ?InstructionArgument&lt;br/&gt; arg3: ?InstructionArgument&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; checkArgs(): void&lt;br/&gt; execute(): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="71" y="229" width="213" height="185" as="geometry" />
+    </mxCell>
+
+    <!-- InstructionArgument -->
+    <mxCell id="node0" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;InstructionArgument&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __construct(type, frame, value): &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; frame: ?string&lt;br/&gt; type: ?string&lt;br/&gt; value: ?string&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; getType(): ?string&lt;br/&gt; getValue(): mixed&lt;br/&gt; isDefined(): bool&lt;br/&gt; isLabel(): bool&lt;br/&gt; isType(): bool&lt;br/&gt; isVar(): bool&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="475" y="461" width="230" height="280" as="geometry" />
+    </mxCell>
+
+    <!-- InstructionData -->
+    <mxCell id="node5" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;InstructionData&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __construct(instruction): &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; arg1: ?InstructionArgument&lt;br/&gt; arg2: ?InstructionArgument&lt;br/&gt; arg3: ?InstructionArgument&lt;br/&gt; instruction: DOMElement&lt;br/&gt; opcode: string&lt;br/&gt; order: int&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; setArgs(): void&lt;br/&gt; setOpcode(): void&lt;br/&gt; setOrder(): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="71" y="451" width="184" height="281" as="geometry" />
+    </mxCell>
+
+    <!-- InstructionFactory -->
+    <mxCell id="node2" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;InstructionFactory&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __construct(stdin, stdout, stderr): &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; stderr: OutputWriter&lt;br/&gt; stdin: InputReader&lt;br/&gt; stdout: OutputWriter&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; createInstruction(instructionData): Instruction&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="71" y="30" width="264" height="161" as="geometry" />
+    </mxCell>
+
+    <!-- ProgramFlow (static class) -->
+    <mxCell id="node3" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;&lt;&lt;static&gt;&gt;&lt;br/&gt;ProgramFlow&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; callStack: int[]&lt;br/&gt; dataStack: array[]&lt;br/&gt; executedInstructionCount: int&lt;br/&gt; frames: Frame[]&lt;br/&gt; globalFrame: Frame&lt;br/&gt; instructionList: InstructionData[]&lt;br/&gt; instructionPointer: int&lt;br/&gt; labels: string[]&lt;br/&gt; temporaryFrame: ?Frame&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; addToFrame(frameType, key, type, value): void&lt;br/&gt; clearTemporaryFrame(): void&lt;br/&gt; continue(): bool&lt;br/&gt; exit(value): void&lt;br/&gt; findLabels(): string[]&lt;br/&gt; getFrame(frameType): ?Frame&lt;br/&gt; getPointer(): int&lt;br/&gt; increment(): void&lt;br/&gt; initialize(instructionList): void&lt;br/&gt; jumpTo(label): void&lt;br/&gt; labelExists(label): bool&lt;br/&gt; popFrame(): ?Frame&lt;br/&gt; popFromCallStack(): ?int&lt;br/&gt; popFromDataStack(): ?array&lt;br/&gt; pushFrame(frame): void&lt;br/&gt; pushToCallStack(pointer): void&lt;br/&gt; pushToDataStack(data): void&lt;br/&gt; setPointer(pointer): void&lt;br/&gt; setTemporaryFrame(frame): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="823" y="-306" width="314" height="650" as="geometry" />
+    </mxCell>
+
+    <!-- Concrete instruction examples -->
+    <mxCell id="concreteInstructions" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Concrete Instructions&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt;InstructionMove&lt;br/&gt;InstructionAdd&lt;br/&gt;InstructionSub&lt;br/&gt;InstructionMul&lt;br/&gt;InstructionIDiv&lt;br/&gt;InstructionRead&lt;br/&gt;InstructionWrite&lt;br/&gt;InstructionJump&lt;br/&gt;InstructionCall&lt;br/&gt;InstructionReturn&lt;br/&gt;InstructionDefVar&lt;br/&gt;InstructionCreateFrame&lt;br/&gt;InstructionPushFrame&lt;br/&gt;InstructionPopFrame&lt;br/&gt;... and many more&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=2;">
+      <mxGeometry x="71" y="780" width="200" height="300" as="geometry" />
+    </mxCell>
+
+    <!-- Relationships -->
+    <!-- Interpreter extends AbstractInterpreter -->
+    <mxCell id="edge0" edge="1" value="" parent="1" source="node4" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#000082;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- InstructionData uses InstructionArgument -->
+    <mxCell id="edge1" edge="1" value="uses" parent="1" source="node5" target="node0" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;startArrow=none;endArrow=open;endSize=12;strokeColor=#595959;exitX=1.000;exitY=0.500;exitDx=0;exitDy=0;entryX=0.000;entryY=0.500;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Instruction uses InstructionData -->
+    <mxCell id="edge2" edge="1" value="uses" parent="1" source="node6" target="node5" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;startArrow=none;endArrow=open;endSize=12;strokeColor=#595959;exitX=0.500;exitY=1.000;exitDx=0;exitDy=0;entryX=0.500;entryY=0.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Concrete instructions extend Instruction -->
+    <mxCell id="edge3" edge="1" value="extends" parent="1" source="concreteInstructions" target="node6" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#000082;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- InstructionFactory creates Instructions -->
+    <mxCell id="edge4" edge="1" value="creates" parent="1" source="node2" target="node6" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;startArrow=none;endArrow=open;endSize=12;strokeColor=#595959;exitX=0.500;exitY=1.000;exitDx=0;exitDy=0;entryX=0.000;entryY=0.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ProgramFlow manages Frame -->
+    <mxCell id="edge5" edge="1" value="manages" parent="1" source="node3" target="node7" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=1;startArrow=none;endArrow=open;endSize=12;strokeColor=#595959;exitX=0.000;exitY=0.500;exitDx=0;exitDy=0;entryX=1.000;entryY=0.500;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+
+  </root>
+</mxGraphModel>
